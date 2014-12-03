@@ -58,7 +58,7 @@ resz(void *buf, size_t old, size_t new)
 {
 	void *nub = mmap(NULL, new, PROT_RW, MAP_MEM, -1, 0);
 
-	if (nub == MAP_FAILED) {
+	if (UNLIKELY(nub == MAP_FAILED)) {
 		return NULL;
 	}
 	(void)memcpy(nub, buf, old);
@@ -146,7 +146,8 @@ split1(const char *fn)
 			if (UNLIKELY(nub == NULL)) {
 				goto fuck;
 			}
-			/* otherwise increase bsz */
+			/* otherwise ass buf and increase bsz */
+			buf = nub;
 			bsz <<= 1U;
 		} else if ((bix -= npr) > 0) {
 			/* memmove to the front */
