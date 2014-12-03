@@ -39,9 +39,6 @@ AC_C_BIGENDIAN
 ## check if yuck is globally available
 AX_CHECK_YUCK
 
-AC_PROG_LEX
-AC_PROG_YACC
-
 ## libtool goddess^Wgoodness
 ## has to be down here as we're turning -Werror'ing off
 LT_INIT
