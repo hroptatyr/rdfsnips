@@ -19,6 +19,12 @@ SUFFIXES =
 CLEANFILES += version.c
 EXTRA_DIST += version.c.in
 
+noinst_PROGRAMS += ttl-split
+ttl_split_SOURCES = ttl-split.c ttl-split.yuck
+ttl_split_CPPFLAGS = $(AM_CPPFLAGS)
+ttl_split_LDFLAGS = $(AM_LDFLAGS)
+BUILT_SOURCES += ttl-split.yucc
+
 
 ## version rules
 version.c: version.c.in $(top_builddir)/.version
