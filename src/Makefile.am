@@ -8,6 +8,7 @@ AM_LDFLAGS = $(XCCLDFLAGS)
 bin_PROGRAMS =
 noinst_PROGRAMS =
 lib_LTLIBRARIES =
+noinst_LIBRARIES =
 noinst_LTLIBRARIES =
 pkglib_LTLIBRARIES =
 noinst_HEADERS =
@@ -19,10 +20,14 @@ SUFFIXES =
 CLEANFILES += version.c
 EXTRA_DIST += version.c.in
 
+noinst_LIBRARIES += libttl.a
+libttl_a_SOURCES = version.c version.h
+
 noinst_PROGRAMS += ttl-split
 ttl_split_SOURCES = ttl-split.c ttl-split.yuck
 ttl_split_CPPFLAGS = $(AM_CPPFLAGS)
 ttl_split_LDFLAGS = $(AM_LDFLAGS)
+ttl_split_LDADD = libttl.a
 BUILT_SOURCES += ttl-split.yucc
 
 
