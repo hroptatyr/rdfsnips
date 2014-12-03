@@ -70,13 +70,51 @@ resz(void *buf, size_t old, size_t new)
 static ssize_t
 proc(const char *buf, size_t bsz)
 {
-	const char *bp = buf;
-	const char *const ep = buf + bsz;
+	const char *sp = buf;
+	const char *const UNUSED(ep) = buf + bsz;
 
+next:
+	/* overread whitespace */
+	for (; *sp > '\0' && *sp <= ' '; sp++);
 	/* statements are always concluded by . so look for that guy */
-	for (const char *eo; (eo = memchr(bp, '.', ep - bp)); bp = eo + 1U) {
+	for (const char *eo, *bp = sp;
+	     (eo = strpbrk(bp, ".<\"")); bp = eo + 1U) {
+		switch (*eo) {
+		case '.':
+			write(STDOUT_FILENO, sp, eo + 1U - sp);
+			write(STDOUT_FILENO, "\n\n", 2U);
+			sp = eo + 1U;
+			goto next;
+		case '<':
+			/* find matching > */
+			if (UNLIKELY((eo = strchr(eo, '>')) == NULL)) {
+				goto out;
+			}
+			break;
+		case '"':
+			/* find matching " or """*/
+			if (eo[1U] != '"') {
+				eo = strchr(eo + 1U, '"');
+			} else if (eo[2U] != '"') {
+				if (UNLIKELY(eo[2U] == '\0')) {
+					goto out;
+				}
+				/* otherwise point to second quote */
+				eo++;
+			} else {
+				/* it's one of those """strings"""" */
+				eo = strstr(eo + 3U, "\"\"\"");
+			}
+			if (UNLIKELY(eo == NULL)) {
+				goto out;
+			}
+			break;
+		default:
+			break;
+		}
 	}
-	return bp - buf;
+out:
+	return sp - buf;
 }
 
 static int
@@ -95,8 +133,10 @@ split1(const char *fn)
 	}
 	/* read into buf */
 	bix = 0U;
-	for (ssize_t nrd, npr; (nrd = read(fd, buf + bix, bsz - bix)) > 0;) {
-		bix += nrd;
+	for (ssize_t nrd, npr;
+	     (nrd = read(fd, buf + bix, bsz - bix - 1U/*\nul*/)) > 0;) {
+		/* mark the end of the buffer */
+		buf[bix += nrd] = '\0';
 		if ((npr = proc(buf, bix)) < 0) {
 			goto fuck;
 		} else if (npr == 0) {
@@ -110,12 +150,14 @@ split1(const char *fn)
 			bsz <<= 1U;
 		} else if ((bix -= npr) > 0) {
 			/* memmove to the front */
-			memmove(buf, buf + bix, bix);
+			memmove(buf, buf + npr, bix);
 		}
 	}
+	/* last try, we don't care how much gets processed */
+	(void)proc(buf, bix);
 
-	/* resource freeing */
 fuck:
+	/* resource freeing */
 	close(fd);
 	if (buf != _buf) {
 		munmap(buf, bsz);
