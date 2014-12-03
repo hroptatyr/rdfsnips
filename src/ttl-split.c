@@ -65,6 +65,20 @@ resz(void *buf, size_t old, size_t new)
 	return nub;
 }
 
+static void
+wr_stmt(const char *s, size_t z)
+{
+	if (*s != '@') {
+		write(STDOUT_FILENO, "\n", 1U);
+	} else {
+		/* cache directives */
+		;
+	}
+	write(STDOUT_FILENO, s, z);
+	write(STDOUT_FILENO, "\n", 1U);
+	return;
+}
+
 
 /* the actual splitting */
 static ssize_t
@@ -81,8 +95,7 @@ next:
 	     (eo = strpbrk(bp, ".<\"")); bp = eo + 1U) {
 		switch (*eo) {
 		case '.':
-			write(STDOUT_FILENO, sp, eo + 1U - sp);
-			write(STDOUT_FILENO, "\n\n", 2U);
+			wr_stmt(sp, eo + 1U - sp);
 			sp = eo + 1U;
 			goto next;
 		case '<':
