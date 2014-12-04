@@ -105,7 +105,7 @@ escapedp(const char *sp, const char *bp)
 }
 
 static size_t
-fl_stmt(const char *buf, size_t bsz)
+wr_buf(const char *buf, size_t bsz)
 {
 	size_t tot = 0U;
 
@@ -132,7 +132,7 @@ wr_stmt(const char *s, size_t z)
 #define fini_stmt()	wr_stmt(NULL, 0U)
 	if (UNLIKELY(z == 0U)) {
 		/* flushing instruction */
-		fl_stmt(buf, bix);
+		wr_buf(buf, bix);
 		if (buf != _buf) {
 			munmap(buf, bsz);
 			buf = _buf;
@@ -168,7 +168,7 @@ wr_stmt(const char *s, size_t z)
 
 	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
 		/* time to flush */
-		fl_stmt(buf, bix);
+		wr_buf(buf, bix);
 		/* reset index pointer */
 		bix = 0U;
 
@@ -191,8 +191,8 @@ wr_stmt(const char *s, size_t z)
 	buf[bix++] = '\n';
 
 	if (istmt >= nstmt) {
-		fl_stmt(dir, dix);
-		fl_stmt(buf, bix);
+		wr_buf(dir, dix);
+		wr_buf(buf, bix);
 		bix = 0U;
 		istmt = 0U;
 	}
