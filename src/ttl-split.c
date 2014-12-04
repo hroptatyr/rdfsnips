@@ -52,6 +52,8 @@
 #define PROT_RW		(PROT_READ | PROT_WRITE)
 #define MAP_MEM		(MAP_PRIVATE | MAP_ANON)
 
+#define assert(x...)
+
 
 /* helpers */
 static __attribute__((const, pure)) size_t
@@ -165,6 +167,13 @@ proc(const char *buf, size_t bsz)
 {
 	const char *sp = buf;
 	const char *const UNUSED(ep) = buf + bsz;
+	enum {
+		FREE,
+		IN_ANGLES,
+		IN_QUOTES,
+		IN_LONG_QUOTES,
+		IN_COMMENT,
+	} st = FREE;
 
 #define fini_proc()	proc(NULL, 0U)
 	if (UNLIKELY(bsz == 0U)) {
@@ -176,9 +185,34 @@ proc(const char *buf, size_t bsz)
 next:
 	/* overread whitespace */
 	for (; *sp > '\0' && *sp <= ' '; sp++);
+
 	/* statements are always concluded by . so look for that guy */
-	for (const char *eo, *bp = sp;
-	     (eo = strpbrk(bp, ".<\"")); bp = eo + 1U) {
+	for (const char *eo, *tp = sp;
+	     ({
+		     switch (st) {
+		     case FREE:
+			     eo = strpbrk(tp, ".<\"#");
+			     break;
+		     case IN_ANGLES:
+			     eo = strchr(tp, '>');
+			     break;
+		     case IN_QUOTES:
+			     eo = strchr(tp, '"');
+			     break;
+		     case IN_LONG_QUOTES:
+			     eo = strstr(tp, "\"\"\"");
+			     break;
+		     case IN_COMMENT:
+			     eo = strchr(tp, '\n');
+			     break;
+		     default:
+			     /* fuck */
+			     eo = NULL;
+			     break;
+		     }
+		     eo;
+	     }) != NULL; tp = eo) {
+		/* check character at point */
 		switch (*eo++) {
 		case '.':
 			wr_stmt(sp, eo - sp);
@@ -186,38 +220,57 @@ next:
 			goto next;
 		case '<':
 			/* find matching > */
-			if (UNLIKELY((eo = strchr(eo, '>')) == NULL)) {
-				goto out;
-			}
+			st = IN_ANGLES;
+			break;
+		case '>':
+			/* yay, go back to free scan */
+			st = FREE;
 			break;
 		case '"':
-			/* find matching " or """ or
-			 * skip this occurrence if it's an escaped " */
-			if (UNLIKELY(escapedp(eo - 1, bp))) {
-
-				eo--;
-			} else if (!*eo) {
-				eo = NULL;
-			} else if (*eo++ != '"') {
-				eo = strchr(eo, '"');
-			} else if (!*eo) {
-				eo = NULL;
-			} else if (*eo++ != '"') {
-				if (UNLIKELY(*eo == '\0')) {
-					goto out;
+			/* skip this occurrence if it's an escaped " */
+			if (LIKELY(!escapedp(eo - 1, tp))) {
+				switch (st) {
+				case FREE:
+					/* check if it's a long quote (""") */
+					if (!eo[0U]) {
+						goto out;
+					} else if (eo[0U] != '"') {
+						st = IN_QUOTES;
+					} else if (!eo[1U]) {
+						goto out;
+					} else if (eo[1U] != '"') {
+						/* oh brill, we're through
+						 * already ... don't change
+						 * the state */
+						eo++;
+					} else {
+						st = IN_LONG_QUOTES;
+						eo += 2U;
+					}
+					break;
+				case IN_QUOTES:
+					st = FREE;
+					break;
+				case IN_LONG_QUOTES:
+					eo += 2U;
+					st = FREE;
+					break;
+				default:
+					/* huh? */
+					break;
 				}
-			} else if (*eo) {
-				/* it's one of those """strings"""" */
-				eo = strstr(eo, "\"\"\"");
-			} else {
-				eo = NULL;
 			}
-			if (LIKELY(eo != NULL)) {
-				break;
-			}
-			/*@fallthrough@*/
+			break;
+		case '#':
+			assert(st == FREE);
+			st = IN_COMMENT;
+			break;
+		case '\n':
+			assert(st == IN_COMMENT);
+			st = FREE;
+			break;
 		default:
-			goto out;
+			break;
 		}
 	}
 out:
