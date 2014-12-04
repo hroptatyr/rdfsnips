@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/mman.h>
+#include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include "nifty.h"
@@ -53,6 +54,9 @@
 #define MAP_MEM		(MAP_PRIVATE | MAP_ANON)
 
 #define assert(x...)
+
+static size_t nstmt;
+static const char *prfx = "x";
 
 
 /* helpers */
@@ -80,6 +84,14 @@ resz(void *buf, size_t old, size_t new)
 	return nub;
 }
 
+#define RESZ(_b, _oz, _nz)						\
+	size_t _nuz_ = _nz;						\
+	void *_nub_ = resz(_b, _oz, _nuz_);				\
+	if (LIKELY(_nub_ != NULL)) {					\
+		_b = _nub_;						\
+		_oz = _nuz_;						\
+	}
+
 static inline bool
 escapedp(const char *sp, const char *bp)
 {
@@ -95,15 +107,23 @@ escapedp(const char *sp, const char *bp)
 }
 
 static size_t
-fl_stmt(const char *buf, size_t bsz)
+wr_buf(int fd, const char *buf, size_t bsz)
 {
 	size_t tot = 0U;
 
 	for (ssize_t nwr;
 	     tot < bsz &&
-		     (nwr = write(STDOUT_FILENO, buf + tot, bsz - tot)) > 0;
+		     (nwr = write(fd, buf + tot, bsz - tot)) > 0;
 	     tot += nwr);
 	return tot;
+}
+
+static void
+fl_stmt(int fd, const char *dir, size_t dsz, const char *stm, size_t stz)
+{
+	wr_buf(fd, dir, dsz);
+	wr_buf(fd, stm, stz);
+	return;
 }
 
 static void
@@ -113,50 +133,96 @@ wr_stmt(const char *s, size_t z)
 	static char *buf = _buf;
 	static size_t bsz = sizeof(_buf);
 	static size_t bix = 0U;
+	static char _dir[4096U];
+	static char *dir = _dir;
+	static size_t dsz = sizeof(_dir);
+	static size_t dix = 0U;
+	static size_t istmt;
+	static size_t cstmt;
+	static int cfd = -1;
+
+	if (UNLIKELY(cfd < 0)) {
+		static char tmpfn[4096U];
+		const int fl = O_CREAT | O_TRUNC | O_RDWR;
+
+		snprintf(tmpfn, sizeof(tmpfn), "%s%04zu", prfx, cstmt++);
+		if (UNLIKELY((cfd = open(tmpfn, fl, 0666)) < 0)) {
+			return;
+		}
+	}
 
 #define fini_stmt()	wr_stmt(NULL, 0U)
 	if (UNLIKELY(z == 0U)) {
 		/* flushing instruction */
-		fl_stmt(buf, bix);
+		fl_stmt(cfd, dir, dix, buf, bix);
+		close(cfd);
+		cfd = -1;
+
 		if (buf != _buf) {
 			munmap(buf, bsz);
 			buf = _buf;
 			bsz = sizeof(_buf);
 		}
 		bix = 0U;
+
+		if (dir != _dir) {
+			munmap(dir, dsz);
+			dir = _dir;
+			dsz = sizeof(_dir);
+		}
+		dix = 0U;
+		return;
+	}
+
+	if (*s == '@') {
+		/* cache directives */
+		/* firstly check whether to resize our directives buffer */
+		if (UNLIKELY(dix + z + 1U/*\n*/ > dsz)) {
+			/* resize */
+			RESZ(dir, dsz, next_2pow(z + 1U))
+			else {
+				return;
+			}
+		}
+		/* just append him */
+		memcpy(dir + dix, s, z);
+		dix += z;
+		dir[dix++] = '\n';
 		return;
 	}
 
 	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
 		/* time to flush */
-		fl_stmt(buf, bix);
+		wr_buf(cfd, buf, bix);
 		/* reset index pointer */
 		bix = 0U;
 
 		if (UNLIKELY(z + 2U/*\n*/ > bsz)) {
 			/* resize :O */
-			size_t nuz = next_2pow(z + 2U);
-			void *nub = resz(buf, bsz, nuz);
-
-			if (UNLIKELY(nub == NULL)) {
+			RESZ(buf, bsz, next_2pow(z + 2U))
+			else {
 				return;
 			}
-			buf = nub;
-			bsz = nuz;
 		}
 	}
 
-	if (*s != '@') {
-		buf[bix++] = '\n';
-	} else {
-		/* cache directives */
-		;
-	}
+	/* otherwise it's a statement */
+	buf[bix++] = '\n';
+	istmt++;
 	/* copy beef */
 	memcpy(buf + bix, s, z);
 	bix += z;
 	/* append newline */
 	buf[bix++] = '\n';
+
+	if (istmt >= nstmt) {
+		fl_stmt(cfd, dir, dix, buf, bix);
+		close(cfd);
+		cfd = -1;
+
+		bix = 0U;
+		istmt = 0U;
+	}
 	return;
 }
 
@@ -301,14 +367,10 @@ split1(const char *fn)
 			goto fuck;
 		} else if (npr == 0 && bix + 1 >= bsz) {
 			/* need a bigger buffer */
-			void *nub = resz(buf, bsz, bsz << 1U);
-
-			if (UNLIKELY(nub == NULL)) {
+			RESZ(buf, bsz, bsz << 1U)
+			else {
 				goto fuck;
 			}
-			/* otherwise ass buf and increase bsz */
-			buf = nub;
-			bsz <<= 1U;
 		} else if (npr == 0) {
 			/* just read some more */
 			;
@@ -345,6 +407,13 @@ main(int argc, char *argv[])
 	if (yuck_parse(argi, argc, argv) < 0) {
 		rc = 1;
 		goto out;
+	}
+
+	if (argi->statements_arg) {
+		nstmt = strtoul(argi->statements_arg, NULL, 0);
+	}
+	if (argi->prefix_arg) {
+		prfx = argi->prefix_arg;
 	}
 
 	if (argi->nargs == 0U) {
