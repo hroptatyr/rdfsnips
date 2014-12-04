@@ -149,21 +149,6 @@ wr_stmt(const char *s, size_t z)
 		return;
 	}
 
-	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
-		/* time to flush */
-		fl_stmt(buf, bix);
-		/* reset index pointer */
-		bix = 0U;
-
-		if (UNLIKELY(z + 2U/*\n*/ > bsz)) {
-			/* resize :O */
-			RESZ(buf, bsz, next_2pow(z + 2U))
-			else {
-				return;
-			}
-		}
-	}
-
 	if (*s == '@') {
 		/* cache directives */
 		/* firstly check whether to resize our directives buffer */
@@ -180,6 +165,22 @@ wr_stmt(const char *s, size_t z)
 		dir[dix++] = '\n';
 		return;
 	}
+
+	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
+		/* time to flush */
+		fl_stmt(buf, bix);
+		/* reset index pointer */
+		bix = 0U;
+
+		if (UNLIKELY(z + 2U/*\n*/ > bsz)) {
+			/* resize :O */
+			RESZ(buf, bsz, next_2pow(z + 2U))
+			else {
+				return;
+			}
+		}
+	}
+
 	/* otherwise it's a statement */
 	buf[bix++] = '\n';
 	istmt++;
