@@ -92,17 +92,69 @@ escapedp(const char *sp, const char *bp)
 	return bksl;
 }
 
+static size_t
+fl_stmt(const char *buf, size_t bsz)
+{
+	size_t tot = 0U;
+
+	for (ssize_t nwr;
+	     tot < bsz &&
+		     (nwr = write(STDOUT_FILENO, buf + tot, bsz - tot)) > 0;
+	     tot += nwr);
+	return tot;
+}
+
 static void
 wr_stmt(const char *s, size_t z)
 {
+	static char _buf[4096U];
+	static char *buf = _buf;
+	static size_t bsz = sizeof(_buf);
+	static size_t bix = 0U;
+
+#define fini_stmt()	wr_stmt(NULL, 0U)
+	if (UNLIKELY(z == 0U)) {
+		/* flushing instruction */
+		fl_stmt(buf, bix);
+		if (buf != _buf) {
+			munmap(buf, bsz);
+			buf = _buf;
+			bsz = sizeof(_buf);
+		}
+		bix = 0U;
+		return;
+	}
+
+	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
+		/* time to flush */
+		fl_stmt(buf, bix);
+		/* reset index pointer */
+		bix = 0U;
+
+		if (UNLIKELY(z + 2U/*\n*/ > bsz)) {
+			/* resize :O */
+			size_t nuz = next_2pow(z + 2U);
+			void *nub = resz(buf, bsz, nuz);
+
+			if (UNLIKELY(nub == NULL)) {
+				return;
+			}
+			buf = nub;
+			bsz = nuz;
+		}
+	}
+
 	if (*s != '@') {
-		write(STDOUT_FILENO, "\n", 1U);
+		buf[bix++] = '\n';
 	} else {
 		/* cache directives */
 		;
 	}
-	write(STDOUT_FILENO, s, z);
-	write(STDOUT_FILENO, "\n", 1U);
+	/* copy beef */
+	memcpy(buf + bix, s, z);
+	bix += z;
+	/* append newline */
+	buf[bix++] = '\n';
 	return;
 }
 
@@ -113,6 +165,13 @@ proc(const char *buf, size_t bsz)
 {
 	const char *sp = buf;
 	const char *const UNUSED(ep) = buf + bsz;
+
+#define fini_proc()	proc(NULL, 0U)
+	if (UNLIKELY(bsz == 0U)) {
+		/* and finalise */
+		fini_stmt();
+		return 0;
+	}
 
 next:
 	/* overread whitespace */
@@ -209,6 +268,8 @@ split1(const char *fn)
 	buf[bix] = '\0';
 	/* last try, we don't care how much gets processed */
 	(void)proc(buf, bix);
+	/* finalise processing */
+	fini_proc();
 
 fuck:
 	/* resource freeing */
