@@ -165,6 +165,12 @@ proc(const char *buf, size_t bsz)
 {
 	const char *sp = buf;
 	const char *const UNUSED(ep) = buf + bsz;
+	enum {
+		FREE,
+		IN_ANGLES,
+		IN_QUOTES,
+		IN_LONG_QUOTES,
+	} st = FREE;
 
 #define fini_proc()	proc(NULL, 0U)
 	if (UNLIKELY(bsz == 0U)) {
@@ -177,8 +183,29 @@ next:
 	/* overread whitespace */
 	for (; *sp > '\0' && *sp <= ' '; sp++);
 	/* statements are always concluded by . so look for that guy */
-	for (const char *eo, *bp = sp;
-	     (eo = strpbrk(bp, ".<\"")); bp = eo + 1U) {
+	for (const char *eo, *tp = sp;
+	     ({
+		     switch (st) {
+		     case FREE:
+			     eo = strpbrk(tp, ".<\"");
+			     break;
+		     case IN_ANGLES:
+			     eo = strchr(tp, '>');
+			     break;
+		     case IN_QUOTES:
+			     eo = strchr(tp, '"');
+			     break;
+		     case IN_LONG_QUOTES:
+			     eo = strstr(tp, "\"\"\"");
+			     break;
+		     default:
+			     /* fuck */
+			     eo = NULL;
+			     break;
+		     }
+		     eo;
+	     }) != NULL; tp = eo) {
+		/* check character at point */
 		switch (*eo++) {
 		case '.':
 			wr_stmt(sp, eo - sp);
@@ -186,41 +213,32 @@ next:
 			goto next;
 		case '<':
 			/* find matching > */
-			if (UNLIKELY((eo = strchr(eo, '>')) == NULL)) {
-				goto out;
-			}
+			st = IN_ANGLES;
+			break;
+		case '>':
+			/* yay, go back to free scan */
+			st = FREE;
 			break;
 		case '"':
-			/* find matching " or """ or
-			 * skip this occurrence if it's an escaped " */
-			if (UNLIKELY(escapedp(eo - 1, bp))) {
-
-				eo--;
-			} else if (!*eo) {
-				eo = NULL;
-			} else if (*eo++ != '"') {
-				eo = strchr(eo, '"');
-			} else if (!*eo) {
-				eo = NULL;
-			} else if (*eo++ != '"') {
-				if (UNLIKELY(*eo == '\0')) {
-					goto out;
+			/* skip this occurrence if it's an escaped " */
+			if (LIKELY(!escapedp(eo - 1, tp))) {
+				switch (st) {
+				case FREE:
+					st = IN_QUOTES;
+					break;
+				case IN_QUOTES:
+					st = FREE;
+					break;
+				default:
+					/* huh? */
+					break;
 				}
-			} else if (*eo) {
-				/* it's one of those """strings"""" */
-				eo = strstr(eo, "\"\"\"");
-			} else {
-				eo = NULL;
 			}
-			if (LIKELY(eo != NULL)) {
-				break;
-			}
-			/*@fallthrough@*/
+			break;
 		default:
-			goto out;
+			break;
 		}
 	}
-out:
 	return sp - buf;
 }
 
