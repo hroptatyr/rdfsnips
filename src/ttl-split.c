@@ -187,7 +187,7 @@ split1(const char *fn)
 		buf[bix += nrd] = '\0';
 		if ((npr = proc(buf, bix)) < 0) {
 			goto fuck;
-		} else if (npr == 0) {
+		} else if (npr == 0 && bix + 1 >= bsz) {
 			/* need a bigger buffer */
 			void *nub = resz(buf, bsz, bsz << 1U);
 
@@ -197,6 +197,9 @@ split1(const char *fn)
 			/* otherwise ass buf and increase bsz */
 			buf = nub;
 			bsz <<= 1U;
+		} else if (npr == 0) {
+			/* just read some more */
+			;
 		} else if ((bix -= npr) > 0) {
 			/* memmove to the front */
 			memmove(buf, buf + npr, bix);
