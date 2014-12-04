@@ -54,6 +54,8 @@
 
 #define assert(x...)
 
+static size_t nstmt;
+
 
 /* helpers */
 static __attribute__((const, pure)) size_t
@@ -121,6 +123,11 @@ wr_stmt(const char *s, size_t z)
 	static char *buf = _buf;
 	static size_t bsz = sizeof(_buf);
 	static size_t bix = 0U;
+	static char _dir[4096U];
+	static char *dir = _dir;
+	static size_t dsz = sizeof(_dir);
+	static size_t dix = 0U;
+	static size_t istmt;
 
 #define fini_stmt()	wr_stmt(NULL, 0U)
 	if (UNLIKELY(z == 0U)) {
@@ -132,6 +139,13 @@ wr_stmt(const char *s, size_t z)
 			bsz = sizeof(_buf);
 		}
 		bix = 0U;
+
+		if (dir != _dir) {
+			munmap(dir, dsz);
+			dir = _dir;
+			dsz = sizeof(_dir);
+		}
+		dix = 0U;
 		return;
 	}
 
@@ -150,17 +164,37 @@ wr_stmt(const char *s, size_t z)
 		}
 	}
 
-	if (*s != '@') {
-		buf[bix++] = '\n';
-	} else {
+	if (*s == '@') {
 		/* cache directives */
-		;
+		/* firstly check whether to resize our directives buffer */
+		if (UNLIKELY(dix + z + 1U/*\n*/ > dsz)) {
+			/* resize */
+			RESZ(dir, dsz, next_2pow(z + 1U))
+			else {
+				return;
+			}
+		}
+		/* just append him */
+		memcpy(dir + dix, s, z);
+		dix += z;
+		dir[dix++] = '\n';
+		return;
 	}
+	/* otherwise it's a statement */
+	buf[bix++] = '\n';
+	istmt++;
 	/* copy beef */
 	memcpy(buf + bix, s, z);
 	bix += z;
 	/* append newline */
 	buf[bix++] = '\n';
+
+	if (istmt >= nstmt) {
+		fl_stmt(dir, dix);
+		fl_stmt(buf, bix);
+		bix = 0U;
+		istmt = 0U;
+	}
 	return;
 }
 
@@ -345,6 +379,10 @@ main(int argc, char *argv[])
 	if (yuck_parse(argi, argc, argv) < 0) {
 		rc = 1;
 		goto out;
+	}
+
+	if (argi->statements_arg) {
+		nstmt = strtoul(argi->statements_arg, NULL, 0);
 	}
 
 	if (argi->nargs == 0U) {

@@ -1,3 +1,5 @@
 Usage: ttl-split [FILE]...
 
 Parse turtle files and split it into sensible chunks.
+
+  -s, --statements=N    Output N statements per file.
