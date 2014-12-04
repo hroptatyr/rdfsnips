@@ -38,6 +38,7 @@
 # include "config.h"
 #endif	/* HAVE_CONFIG_H */
 #include <unistd.h>
+#include <stdbool.h>
 #include <sys/mman.h>
 #include <string.h>
 #include <fcntl.h>
@@ -53,6 +54,18 @@
 
 
 /* helpers */
+static __attribute__((const, pure)) size_t
+next_2pow(size_t x)
+{
+	x--;
+	x |= x >> 1U;
+	x |= x >> 2U;
+	x |= x >> 4U;
+	x |= x >> 8U;
+	x |= x >> 16U;
+	return ++x;
+}
+
 static void*
 resz(void *buf, size_t old, size_t new)
 {
@@ -63,6 +76,20 @@ resz(void *buf, size_t old, size_t new)
 	}
 	(void)memcpy(nub, buf, old);
 	return nub;
+}
+
+static inline bool
+escapedp(const char *sp, const char *bp)
+{
+/* find out if sp is backslash-escaped
+ * but backslash-escaped backslashes won't count,
+ * so make sure the number of backslashes before sp is odd */
+	int bksl = 0;
+
+	while (sp-- > bp && *sp == '\\') {
+		bksl ^= 1;
+	}
+	return bksl;
 }
 
 static void
@@ -93,10 +120,10 @@ next:
 	/* statements are always concluded by . so look for that guy */
 	for (const char *eo, *bp = sp;
 	     (eo = strpbrk(bp, ".<\"")); bp = eo + 1U) {
-		switch (*eo) {
+		switch (*eo++) {
 		case '.':
-			wr_stmt(sp, eo + 1U - sp);
-			sp = eo + 1U;
+			wr_stmt(sp, eo - sp);
+			sp = eo;
 			goto next;
 		case '<':
 			/* find matching > */
@@ -105,25 +132,33 @@ next:
 			}
 			break;
 		case '"':
-			/* find matching " or """*/
-			if (eo[1U] != '"') {
-				eo = strchr(eo + 1U, '"');
-			} else if (eo[2U] != '"') {
-				if (UNLIKELY(eo[2U] == '\0')) {
+			/* find matching " or """ or
+			 * skip this occurrence if it's an escaped " */
+			if (UNLIKELY(escapedp(eo - 1, bp))) {
+
+				eo--;
+			} else if (!*eo) {
+				eo = NULL;
+			} else if (*eo++ != '"') {
+				eo = strchr(eo, '"');
+			} else if (!*eo) {
+				eo = NULL;
+			} else if (*eo++ != '"') {
+				if (UNLIKELY(*eo == '\0')) {
 					goto out;
 				}
-				/* otherwise point to second quote */
-				eo++;
-			} else {
+			} else if (*eo) {
 				/* it's one of those """strings"""" */
-				eo = strstr(eo + 3U, "\"\"\"");
+				eo = strstr(eo, "\"\"\"");
+			} else {
+				eo = NULL;
 			}
-			if (UNLIKELY(eo == NULL)) {
-				goto out;
+			if (LIKELY(eo != NULL)) {
+				break;
 			}
-			break;
+			/*@fallthrough@*/
 		default:
-			break;
+			goto out;
 		}
 	}
 out:
