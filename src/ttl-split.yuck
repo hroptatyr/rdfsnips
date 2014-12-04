@@ -1,5 +1,7 @@
 Usage: ttl-split [FILE]...
 
-Parse turtle files and split it into sensible chunks.
+Parse turtle files and split it into fixed-size pieces.
+Default are 1000 statements and files prefixed with `x'.
 
+  --prefix=STRING       Prepend STRING before generated files, default: x.
   -s, --statements=N    Output N statements per file.

@@ -412,6 +412,9 @@ main(int argc, char *argv[])
 	if (argi->statements_arg) {
 		nstmt = strtoul(argi->statements_arg, NULL, 0);
 	}
+	if (argi->prefix_arg) {
+		prfx = argi->prefix_arg;
+	}
 
 	if (argi->nargs == 0U) {
 		goto one;
