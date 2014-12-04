@@ -205,6 +205,8 @@ split1(const char *fn)
 			memmove(buf, buf + npr, bix);
 		}
 	}
+	/* finalise buffer again, just in case */
+	buf[bix] = '\0';
 	/* last try, we don't care how much gets processed */
 	(void)proc(buf, bix);
 
