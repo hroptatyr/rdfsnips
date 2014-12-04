@@ -52,6 +52,8 @@
 #define PROT_RW		(PROT_READ | PROT_WRITE)
 #define MAP_MEM		(MAP_PRIVATE | MAP_ANON)
 
+#define assert(x...)
+
 
 /* helpers */
 static __attribute__((const, pure)) size_t
@@ -170,6 +172,7 @@ proc(const char *buf, size_t bsz)
 		IN_ANGLES,
 		IN_QUOTES,
 		IN_LONG_QUOTES,
+		IN_COMMENT,
 	} st = FREE;
 
 #define fini_proc()	proc(NULL, 0U)
@@ -182,12 +185,13 @@ proc(const char *buf, size_t bsz)
 next:
 	/* overread whitespace */
 	for (; *sp > '\0' && *sp <= ' '; sp++);
+
 	/* statements are always concluded by . so look for that guy */
 	for (const char *eo, *tp = sp;
 	     ({
 		     switch (st) {
 		     case FREE:
-			     eo = strpbrk(tp, ".<\"");
+			     eo = strpbrk(tp, ".<\"#");
 			     break;
 		     case IN_ANGLES:
 			     eo = strchr(tp, '>');
@@ -197,6 +201,9 @@ next:
 			     break;
 		     case IN_LONG_QUOTES:
 			     eo = strstr(tp, "\"\"\"");
+			     break;
+		     case IN_COMMENT:
+			     eo = strchr(tp, '\n');
 			     break;
 		     default:
 			     /* fuck */
@@ -237,7 +244,6 @@ next:
 						 * the state */
 						eo++;
 					} else {
-						fputs("LONG\n", stderr);
 						st = IN_LONG_QUOTES;
 						eo += 2U;
 					}
@@ -254,6 +260,14 @@ next:
 					break;
 				}
 			}
+			break;
+		case '#':
+			assert(st == FREE);
+			st = IN_COMMENT;
+			break;
+		case '\n':
+			assert(st == IN_COMMENT);
+			st = FREE;
 			break;
 		default:
 			break;
