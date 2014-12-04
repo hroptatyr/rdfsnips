@@ -55,7 +55,7 @@
 
 #define assert(x...)
 
-static size_t nstmt;
+static size_t nstmt = 1000;
 static const char *prfx = "x";
 
 
