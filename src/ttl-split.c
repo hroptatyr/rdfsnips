@@ -80,6 +80,14 @@ resz(void *buf, size_t old, size_t new)
 	return nub;
 }
 
+#define RESZ(_b, _oz, _nz)						\
+	size_t _nuz_ = _nz;						\
+	void *_nub_ = resz(_b, _oz, _nuz_);				\
+	if (LIKELY(_nub_ != NULL)) {					\
+		_b = _nub_;						\
+		_oz = _nuz_;						\
+	}
+
 static inline bool
 escapedp(const char *sp, const char *bp)
 {
@@ -135,14 +143,10 @@ wr_stmt(const char *s, size_t z)
 
 		if (UNLIKELY(z + 2U/*\n*/ > bsz)) {
 			/* resize :O */
-			size_t nuz = next_2pow(z + 2U);
-			void *nub = resz(buf, bsz, nuz);
-
-			if (UNLIKELY(nub == NULL)) {
+			RESZ(buf, bsz, next_2pow(z + 2U))
+			else {
 				return;
 			}
-			buf = nub;
-			bsz = nuz;
 		}
 	}
 
@@ -301,14 +305,10 @@ split1(const char *fn)
 			goto fuck;
 		} else if (npr == 0 && bix + 1 >= bsz) {
 			/* need a bigger buffer */
-			void *nub = resz(buf, bsz, bsz << 1U);
-
-			if (UNLIKELY(nub == NULL)) {
+			RESZ(buf, bsz, bsz << 1U)
+			else {
 				goto fuck;
 			}
-			/* otherwise ass buf and increase bsz */
-			buf = nub;
-			bsz <<= 1U;
 		} else if (npr == 0) {
 			/* just read some more */
 			;
