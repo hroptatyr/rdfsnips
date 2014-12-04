@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/mman.h>
+#include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include "nifty.h"
@@ -55,6 +56,7 @@
 #define assert(x...)
 
 static size_t nstmt;
+static const char *prfx = "x";
 
 
 /* helpers */
@@ -105,15 +107,23 @@ escapedp(const char *sp, const char *bp)
 }
 
 static size_t
-wr_buf(const char *buf, size_t bsz)
+wr_buf(int fd, const char *buf, size_t bsz)
 {
 	size_t tot = 0U;
 
 	for (ssize_t nwr;
 	     tot < bsz &&
-		     (nwr = write(STDOUT_FILENO, buf + tot, bsz - tot)) > 0;
+		     (nwr = write(fd, buf + tot, bsz - tot)) > 0;
 	     tot += nwr);
 	return tot;
+}
+
+static void
+fl_stmt(int fd, const char *dir, size_t dsz, const char *stm, size_t stz)
+{
+	wr_buf(fd, dir, dsz);
+	wr_buf(fd, stm, stz);
+	return;
 }
 
 static void
@@ -128,11 +138,26 @@ wr_stmt(const char *s, size_t z)
 	static size_t dsz = sizeof(_dir);
 	static size_t dix = 0U;
 	static size_t istmt;
+	static size_t cstmt;
+	static int cfd = -1;
+
+	if (UNLIKELY(cfd < 0)) {
+		static char tmpfn[4096U];
+		const int fl = O_CREAT | O_TRUNC | O_RDWR;
+
+		snprintf(tmpfn, sizeof(tmpfn), "%s%04zu", prfx, cstmt++);
+		if (UNLIKELY((cfd = open(tmpfn, fl, 0666)) < 0)) {
+			return;
+		}
+	}
 
 #define fini_stmt()	wr_stmt(NULL, 0U)
 	if (UNLIKELY(z == 0U)) {
 		/* flushing instruction */
-		wr_buf(buf, bix);
+		fl_stmt(cfd, dir, dix, buf, bix);
+		close(cfd);
+		cfd = -1;
+
 		if (buf != _buf) {
 			munmap(buf, bsz);
 			buf = _buf;
@@ -168,7 +193,7 @@ wr_stmt(const char *s, size_t z)
 
 	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
 		/* time to flush */
-		wr_buf(buf, bix);
+		wr_buf(cfd, buf, bix);
 		/* reset index pointer */
 		bix = 0U;
 
@@ -191,8 +216,10 @@ wr_stmt(const char *s, size_t z)
 	buf[bix++] = '\n';
 
 	if (istmt >= nstmt) {
-		wr_buf(dir, dix);
-		wr_buf(buf, bix);
+		fl_stmt(cfd, dir, dix, buf, bix);
+		close(cfd);
+		cfd = -1;
+
 		bix = 0U;
 		istmt = 0U;
 	}
