@@ -224,9 +224,29 @@ next:
 			if (LIKELY(!escapedp(eo - 1, tp))) {
 				switch (st) {
 				case FREE:
-					st = IN_QUOTES;
+					/* check if it's a long quote (""") */
+					if (!eo[0U]) {
+						goto out;
+					} else if (eo[0U] != '"') {
+						st = IN_QUOTES;
+					} else if (!eo[1U]) {
+						goto out;
+					} else if (eo[1U] != '"') {
+						/* oh brill, we're through
+						 * already ... don't change
+						 * the state */
+						eo++;
+					} else {
+						fputs("LONG\n", stderr);
+						st = IN_LONG_QUOTES;
+						eo += 2U;
+					}
 					break;
 				case IN_QUOTES:
+					st = FREE;
+					break;
+				case IN_LONG_QUOTES:
+					eo += 2U;
 					st = FREE;
 					break;
 				default:
@@ -239,6 +259,7 @@ next:
 			break;
 		}
 	}
+out:
 	return sp - buf;
 }
 
