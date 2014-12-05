@@ -17,6 +17,16 @@ BUILT_SOURCES =
 check_PROGRAMS =
 CLEANFILES = $(check_PROGRAMS)
 
+## summon our helper
 include clitoris.am
+AM_CLIT_LOG_FLAGS = --builddir $(builddir) --verbose
+TESTS_ENVIRONMENT = LC_ALL=C
+
+TESTS += $(cli_tests)
+cli_tests =
+
+EXTRA_DIST += gnd-extr.ttl
+
+cli_tests += split-01.clit
 
 ## Makefile.am ends here
