@@ -22,6 +22,7 @@ EXTRA_DIST += version.c.in
 
 noinst_LIBRARIES += libttl.a
 libttl_a_SOURCES = version.c version.h
+libttl_a_SOURCES += nifty.h
 
 bin_PROGRAMS += ttl-split
 ttl_split_SOURCES = ttl-split.c ttl-split.yuck
