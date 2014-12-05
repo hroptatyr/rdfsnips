@@ -1,0 +1,12 @@
+#!/usr/bin/clitoris  ## -*- shell-script -*-
+
+$ ttl-split -l 50 "${srcdir}/gnd-extr.ttl"
+$ head -n 306 "${srcdir}/gnd-extr.ttl" > "gnd-1.ttl"
+$ head -n 16 "${srcdir}/gnd-extr.ttl" > "gnd-2.ttl"
+$ tail -n 93 "${srcdir}/gnd-extr.ttl" >> "gnd-2.ttl"
+$ cat "x0000"
+< "gnd-1.ttl"
+$ cat "x0001"
+< "gnd-2.ttl"
+$ rm -f "x0000" "x0001" "gnd-1.ttl" "gnd-2.ttl"
+$

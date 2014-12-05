@@ -1,0 +1,7 @@
+#!/usr/bin/clitoris  ## -*- shell-script -*-
+
+$ ttl-split "${srcdir}/gnd-extr.ttl"
+$ cat "x0000"
+< "${srcdir}/gnd-extr.ttl"
+$ rm -f "x0000"
+$

@@ -1,0 +1,399 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix sf: <http://www.opengis.net/ont/sf#> .
+@prefix isbd: <http://iflastandards.info/ns/isbd/elements/> .
+@prefix gndo: <http://d-nb.info/standards/elementset/gnd#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix marcRole: <http://id.loc.gov/vocabulary/relators/> .
+@prefix lib: <http://purl.org/library/> .
+@prefix umbel: <http://umbel.org/umbel#> .
+@prefix rdau: <http://rdaregistry.info/Elements/u/> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<http://d-nb.info/gnd/1-2> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "1-2" ;
+	gndo:oldAuthorityNumber "(DE-588b)1-2" ;
+	gndo:variantNameForTheConferenceOrEvent "Conferentie van Niet-Kernwapenstaten" , "Conference on Non-Nuclear Weapon States" ;
+	gndo:preferredNameForTheConferenceOrEvent "Conference of Non-Nuclear Weapon States" .
+
+<http://d-nb.info/gnd/2-4> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "2-4" ;
+	gndo:oldAuthorityNumber "(DE-588b)2-4" ;
+	gndo:preferredNameForTheConferenceOrEvent "Conferenza Nazionale della Ceramica <1963, Vicenza>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-IT> ;
+	gndo:dateOfConferenceOrEvent "1963" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/4063445-0> .
+
+<http://d-nb.info/gnd/3-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "3-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)3-6" ;
+	gndo:preferredNameForTheConferenceOrEvent "Conferinţă de Sudura şi Încercari de Metale" ;
+	gndo:precedingConferenceOrEvent <http://d-nb.info/gnd/1216918-3> ;
+	gndo:succeedingConferenceOrEvent <http://d-nb.info/gnd/5038504-5> .
+
+<http://d-nb.info/gnd/4-8> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "4-8" ;
+	gndo:oldAuthorityNumber "(DE-588b)4-8" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Anesthésistes Réanimateurs d'Expression Française" .
+
+<http://d-nb.info/gnd/5-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "5-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)5-X" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Associations Régionales pour la Sauvegarde de l'Enfance et de l'Adolescence" .
+
+<http://d-nb.info/gnd/6-1> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "6-1" ;
+	gndo:oldAuthorityNumber "(DE-588b)6-1" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Belge de la Route" .
+
+<http://d-nb.info/gnd/7-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "7-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)7-3" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès de Calcul et de Traitement de l'Information" ;
+	gndo:succeedingConferenceOrEvent <http://d-nb.info/gnd/8-5> .
+
+<http://d-nb.info/gnd/8-5> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "8-5" ;
+	gndo:oldAuthorityNumber "(DE-588b)8-5" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès d'Informatique et de Recherche Opérationnelle" ;
+	gndo:precedingConferenceOrEvent <http://d-nb.info/gnd/7-3> .
+
+<http://d-nb.info/gnd/9-7> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "9-7" ;
+	gndo:oldAuthorityNumber "(DE-588b)9-7" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congresul al Cooperației de Consum din Republica Populara Romîna" ;
+	gndo:succeedingConferenceOrEvent <http://d-nb.info/gnd/5021949-2> .
+
+<http://d-nb.info/gnd/10-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "10-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)10-3" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Économistes de Langue Française" .
+
+<http://d-nb.info/gnd/11-5> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "11-5" ;
+	gndo:oldAuthorityNumber "(DE-588b)11-5" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Européen d'Équipement Pétrolier" .
+
+<http://d-nb.info/gnd/12-7> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "12-7" ;
+	gndo:oldAuthorityNumber "(DE-588b)12-7" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Européen de l'Ethnie Française d'Europe" .
+
+<http://d-nb.info/gnd/13-9> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "13-9" ;
+	gndo:oldAuthorityNumber "(DE-588b)13-9" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Européen de Médecine Sportive" .
+
+<http://d-nb.info/gnd/14-0> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "14-0" ;
+	gndo:oldAuthorityNumber "(DE-588b)14-0" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Européen du Symbolisme" .
+
+<http://d-nb.info/gnd/15-2> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "15-2" ;
+	gndo:oldAuthorityNumber "(DE-588b)15-2" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès de Fonderie" .
+
+<http://d-nb.info/gnd/17-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "17-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)17-6" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Français de l'Embouteillage" .
+
+<http://d-nb.info/gnd/18-8> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "18-8" ;
+	gndo:oldAuthorityNumber "(DE-588b)18-8" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Français de Stomatologie" .
+
+<http://d-nb.info/gnd/19-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "19-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)19-X" ;
+	gndo:preferredNameForTheCorporateBody "Congrès sur l'Histoire de l'Abbaye Saint-Victor de Marseille" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR> .
+
+<http://d-nb.info/gnd/20-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "20-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)20-6" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès d'Histoire Littéraire" .
+
+<http://d-nb.info/gnd/21-8> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "21-8" ;
+	gndo:oldAuthorityNumber "(DE-588b)21-8" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès de l'Industrie du Gaz" .
+
+<http://d-nb.info/gnd/22-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "22-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)22-X" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès International d'Acupuncture" ;
+	gndo:preferredNameForTheConferenceOrEvent "Internationaler Kongreß für Akupunktur" .
+
+<http://d-nb.info/gnd/23-1> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "23-1" ;
+	gndo:oldAuthorityNumber "(DE-588b)23-1" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International d'Anthropologie Différentielle" .
+
+<http://d-nb.info/gnd/24-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "24-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)24-3" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International sur les Applications du Vide et du Froid dans les Industries Alimentaires" .
+
+<http://d-nb.info/gnd/25-5> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "25-5" ;
+	gndo:oldAuthorityNumber "(DE-588b)25-5" ;
+	gndo:variantNameForTheConferenceOrEvent "Congreso Internacional de Quimica Industrial" , "Internationaal Congres voor Industriele Chemie" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de Chimie Industrielle" .
+
+<http://d-nb.info/gnd/27-9> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "27-9" ;
+	gndo:oldAuthorityNumber "(DE-588b)27-9" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International du Film Médical" .
+
+<http://d-nb.info/gnd/28-0> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "28-0" ;
+	gndo:oldAuthorityNumber "(DE-588b)28-0" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de la Fonction Biliaire" .
+
+<http://d-nb.info/gnd/29-2> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "29-2" ;
+	gndo:oldAuthorityNumber "(DE-588b)29-2" ;
+	gndo:variantNameForTheConferenceOrEvent "Congresso Internazionale d'Igiene e Medicina Mediterranea" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International d'Hygiène et de Médecine Méditerranéenne" .
+
+<http://d-nb.info/gnd/30-9> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "30-9" ;
+	gndo:oldAuthorityNumber "(DE-588b)30-9" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès International d'Hygiène Scolaire et Universitaire" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International d'Hygiène et de Médecine Scolaires" .
+
+<http://d-nb.info/gnd/31-0> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "31-0" ;
+	gndo:oldAuthorityNumber "(DE-588b)31-0" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de l'Industrie Morutière dans l'Atlantique-Nord" .
+
+<http://d-nb.info/gnd/32-2> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "32-2" ;
+	gndo:oldAuthorityNumber "(DE-588b)5045366-X" , "(DE-588b)32-2" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès International de Langue Française de Médecine Légale et Médecine Sociale" , "Congrès International de Médecine Légale et Sociale de Langue Française" , "Congrès International de Médecine Légale et de Médecine Sociale de Langue Française" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de Langue Française de Médecine Légale et de Médecine Sociale" ;
+	gndo:precedingConferenceOrEvent <http://d-nb.info/gnd/10028592-2> .
+
+<http://d-nb.info/gnd/33-4> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "33-4" ;
+	gndo:oldAuthorityNumber "(DE-588b)33-4" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès International de Médecine Agricole" , "Internationaler Kongreß für Ländliche Gesundheitspflege" ;
+	gndo:preferredNameForTheConferenceOrEvent "International Congress of Agricultural Medicine" .
+
+<http://d-nb.info/gnd/34-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "34-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)34-6" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès international de médecine psychosomatique" ;
+	gndo:preferredNameForTheConferenceOrEvent "International Congress of Psychosomatic Medicine" .
+
+<http://d-nb.info/gnd/35-8> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "35-8" ;
+	gndo:oldAuthorityNumber "(DE-588b)35-8" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de la Neutralité de la Médecine" .
+
+<http://d-nb.info/gnd/36-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "36-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)36-X" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès International de Phlébologie" ;
+	gndo:preferredNameForTheConferenceOrEvent "Internationaler Kongreß für Phlebologie" .
+
+<http://d-nb.info/gnd/37-1> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "37-1" ;
+	gndo:oldAuthorityNumber "(DE-588b)37-1" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International Les Problèmes Juridiques que Poserait l'Entrée de la Grande Bretagne dans le Marché Commun <1967, Rouen>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR> ;
+	gndo:dateOfConferenceOrEvent "1967" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/4050751-8> .
+
+<http://d-nb.info/gnd/38-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "38-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)38-3" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès International de l'UER sur la Radio et la Télévision Éducatives" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International sur la Radio et la Télévision Éducatives" .
+
+<http://d-nb.info/gnd/39-5> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "39-5" ;
+	gndo:oldAuthorityNumber "(DE-588b)39-5" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International Vers la Société de Type Européen <1967, Deauville>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR> ;
+	gndo:dateOfConferenceOrEvent "1967" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/4342427-2> .
+
+<http://d-nb.info/gnd/41-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "41-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)41-3" ;
+	gndo:variantNameForTheConferenceOrEvent "Congresso Internazionale Stendhaliano" , "Congrès Stendhalien International" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International Stendhalien" ;
+	gndo:precedingConferenceOrEvent <http://d-nb.info/gnd/5021857-8> .
+
+<http://d-nb.info/gnd/42-5> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "42-5" ;
+	gndo:oldAuthorityNumber "(DE-588b)42-5" ;
+	gndo:variantNameForTheConferenceOrEvent "Congresso Internazionale di Stomatologia" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de Stomatologie" ;
+	gndo:precedingConferenceOrEvent <http://d-nb.info/gnd/5246417-9> .
+
+<http://d-nb.info/gnd/43-7> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "43-7" ;
+	gndo:oldAuthorityNumber "(DE-588b)43-7" ;
+	gndo:variantNameForTheConferenceOrEvent "Convegno Internazionale sull'Impiego degli Audiovisivi per l'Istruzione e l'Addestramento Professionale in Africa" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International sur l'Utilisation des Moyens Audio-visuels pour l'Instruction et l'Enseignement Professionnel en Afrique" .
+
+<http://d-nb.info/gnd/44-9> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "44-9" ;
+	gndo:oldAuthorityNumber "(DE-588b)44-9" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès International de la Vulgarisation Agricole <1957, Wageningen>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-NL> ;
+	gndo:dateOfConferenceOrEvent "1957" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/4118945-0> .
+
+<http://d-nb.info/gnd/45-0> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "45-0" ;
+	gndo:oldAuthorityNumber "(DE-588b)45-0" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Interparlementaire du Tourisme" .
+
+<http://d-nb.info/gnd/46-2> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "46-2" ;
+	gndo:oldAuthorityNumber "(DE-588b)46-2" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès Français d'Anesthésiologie" , "Congrès National d'Anesthésie-Réanimation" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National d'Anesthésie Réanimation" ;
+	gndo:temporaryNameOfTheConferenceOrEvent <http://d-nb.info/gnd/240034-0> .
+
+<http://d-nb.info/gnd/47-4> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "47-4" ;
+	gndo:oldAuthorityNumber "(DE-588b)47-4" ;
+	gndo:variantNameForTheConferenceOrEvent "Belgisch Nationaal Congres van Pneumologie en van Phtisiologie" , "Nationaal Congres van Pneumologie en van Phtisiologie" , "Congres van Pneumologie en van Phtisiologie" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National Belge de Pneumologie et de Phtisiologie" .
+
+<http://d-nb.info/gnd/48-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "48-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)48-6" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National de l'Habitat Rural" .
+
+<http://d-nb.info/gnd/50-4> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "50-4" ;
+	gndo:oldAuthorityNumber "(DE-588b)50-4" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès National d'Higiene et de la Sécurité du Travail" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National d'Hygiène et de la Sécurité du Travail" ;
+	gndo:succeedingConferenceOrEvent <http://d-nb.info/gnd/5199213-9> .
+
+<http://d-nb.info/gnd/51-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "51-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)51-6" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès de Littérature Comparée" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National de Littérature Comparée" .
+
+<http://d-nb.info/gnd/52-8> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "52-8" ;
+	gndo:oldAuthorityNumber "(DE-588b)52-8" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National d'Orientation Scolaire Professionnelle" .
+
+<http://d-nb.info/gnd/53-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "53-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)53-X" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National pour la Prévention de la Pollution Atmosphérique" .
+
+<http://d-nb.info/gnd/56-5> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "56-5" ;
+	gndo:oldAuthorityNumber "(DE-588b)56-5" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National de Spéléologie <Fédération Française de Spéléologie>" .
+
+<http://d-nb.info/gnd/57-7> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "57-7" ;
+	gndo:oldAuthorityNumber "(DE-588b)57-7" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès National de Transfusion Sanguine" ;
+	gndo:precedingConferenceOrEvent <http://d-nb.info/gnd/5175548-8> .
+
+<http://d-nb.info/gnd/58-9> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "58-9" ;
+	gndo:oldAuthorityNumber "(DE-588b)58-9" ;
+	gndo:variantNameForTheConferenceOrEvent "Congrès National des Notaires de France" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Notaires de France" .
+
+<http://d-nb.info/gnd/59-0> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "59-0" ;
+	gndo:oldAuthorityNumber "(DE-588b)59-0" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Préhistorique de France" .
+
+<http://d-nb.info/gnd/60-7> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "60-7" ;
+	gndo:oldAuthorityNumber "(DE-588b)60-7" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès sur les Problèmes Ballistiques <1960, Saint-Louis>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR> ;
+	gndo:dateOfConferenceOrEvent "1960" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/17258-3> .
+
+<http://d-nb.info/gnd/61-9> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "61-9" ;
+	gndo:oldAuthorityNumber "(DE-588b)61-9" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès de la Protection des Cultures Tropicales <1965, Marseille>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR> ;
+	gndo:dateOfConferenceOrEvent "1965" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/4037694-1> .
+
+<http://d-nb.info/gnd/62-0> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "62-0" ;
+	gndo:oldAuthorityNumber "(DE-588b)62-0" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Psychanalystes de Langues Romanes" .
+
+<http://d-nb.info/gnd/63-2> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "63-2" ;
+	gndo:oldAuthorityNumber "(DE-588b)63-2" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Romanistes Scandinaves" .
+
+<http://d-nb.info/gnd/64-4> a gndo:ConferenceOrEvent ;
+	gndo:gndIdentifier "64-4" ;
+	gndo:oldAuthorityNumber "(DE-588b)64-4" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès Scientifique Fêtes et Cérémonies Liturgiques en l'Honneur des Saints Abbés Odon et Odilon <1949, Cluny>" ;
+	gndo:geographicAreaCode <http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR> ;
+	gndo:dateOfConferenceOrEvent "1949" ;
+	gndo:placeOfConferenceOrEvent <http://d-nb.info/gnd/4010317-1> .
+
+<http://d-nb.info/gnd/65-6> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "65-6" ;
+	gndo:oldAuthorityNumber "(DE-588b)65-6" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congrès des Sociétés de Philosophie de Langue Française" .
+
+<http://d-nb.info/gnd/66-8> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "66-8" ;
+	gndo:oldAuthorityNumber "(DE-588b)66-8" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congreso de Academias de la Lengua Española" .
+
+<http://d-nb.info/gnd/67-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "67-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)67-X" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congreso Arqueológico del Sudeste" ;
+	gndo:temporaryNameOfTheConferenceOrEvent <http://d-nb.info/gnd/65672-0> .
+
+<http://d-nb.info/gnd/68-1> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "68-1" ;
+	gndo:oldAuthorityNumber "(DE-588b)68-1" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congreso Bolivariano des Archiveros" .
+
+<http://d-nb.info/gnd/69-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "69-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)69-3" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congreso de Economía Nacional" .
+
+<http://d-nb.info/gnd/70-X> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "70-X" ;
+	gndo:oldAuthorityNumber "(DE-588b)70-X" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congreso Español de Estudios Clásicos" .
+
+<http://d-nb.info/gnd/71-1> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "71-1" ;
+	gndo:oldAuthorityNumber "(DE-588b)71-1" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congreso Español de Historia de la Medicina" .
+
+<http://d-nb.info/gnd/72-3> a gndo:SeriesOfConferenceOrEvent ;
+	gndo:gndIdentifier "72-3" ;
+	gndo:oldAuthorityNumber "(DE-588b)72-3" ;
+	gndo:variantNameForTheConferenceOrEvent "Congresso di Studi Arabi e Islamici" , "Congreso de Estudios Arabes e Islámicos" , "Kongreß für Arabistik und Islamwissenschaft" , "Congrès d'Etudes Arabes et Islamiques" , "Congresso de Estudos Arabes e Islâmicos" , "Congrès International d'Arabisants et d'Islamisants" ;
+	gndo:preferredNameForTheConferenceOrEvent "Congress of Arabic and Islamic Studies" .
