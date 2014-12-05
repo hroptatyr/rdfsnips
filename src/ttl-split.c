@@ -119,14 +119,6 @@ wr_buf(int fd, const char *buf, size_t bsz)
 }
 
 static void
-fl_stmt(int fd, const char *dir, size_t dsz, const char *stm, size_t stz)
-{
-	wr_buf(fd, dir, dsz);
-	wr_buf(fd, stm, stz);
-	return;
-}
-
-static void
 wr_stmt(const char *s, size_t z)
 {
 	static char _buf[4096U];
@@ -154,7 +146,7 @@ wr_stmt(const char *s, size_t z)
 #define fini_stmt()	wr_stmt(NULL, 0U)
 	if (UNLIKELY(z == 0U)) {
 		/* flushing instruction */
-		fl_stmt(cfd, dir, dix, buf, bix);
+		wr_buf(cfd, buf, bix);
 		close(cfd);
 		cfd = -1;
 
@@ -188,7 +180,6 @@ wr_stmt(const char *s, size_t z)
 		memcpy(dir + dix, s, z);
 		dix += z;
 		dir[dix++] = '\n';
-		return;
 	}
 
 	if (UNLIKELY(bix + z + 2U/*\n*/ > bsz)) {
@@ -206,9 +197,11 @@ wr_stmt(const char *s, size_t z)
 		}
 	}
 
-	/* otherwise it's a statement */
-	buf[bix++] = '\n';
-	istmt++;
+	/* directives won't qualify as statements */
+	if (*s != '@') {
+		buf[bix++] = '\n';
+		istmt++;
+	}
 	/* copy beef */
 	memcpy(buf + bix, s, z);
 	bix += z;
@@ -216,12 +209,16 @@ wr_stmt(const char *s, size_t z)
 	buf[bix++] = '\n';
 
 	if (istmt >= nstmt) {
-		fl_stmt(cfd, dir, dix, buf, bix);
+		/* flush */
+		wr_buf(cfd, buf, bix);
 		close(cfd);
 		cfd = -1;
 
-		bix = 0U;
+		/* reset counter */
 		istmt = 0U;
+
+		/* prep buffer for next run */
+		memcpy(buf, dir, bix = dix);
 	}
 	return;
 }
