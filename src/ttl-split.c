@@ -133,22 +133,14 @@ wr_stmt(const char *s, size_t z)
 	static size_t cstmt;
 	static int cfd = -1;
 
-	if (UNLIKELY(cfd < 0)) {
-		static char tmpfn[4096U];
-		const int fl = O_CREAT | O_TRUNC | O_RDWR;
-
-		snprintf(tmpfn, sizeof(tmpfn), "%s%04zu", prfx, cstmt++);
-		if (UNLIKELY((cfd = open(tmpfn, fl, 0666)) < 0)) {
-			return;
-		}
-	}
-
 #define fini_stmt()	wr_stmt(NULL, 0U)
 	if (UNLIKELY(z == 0U)) {
 		/* flushing instruction */
-		wr_buf(cfd, buf, bix);
-		close(cfd);
-		cfd = -1;
+		if (LIKELY(cfd >= 0)) {
+			wr_buf(cfd, buf, bix);
+			close(cfd);
+			cfd = -1;
+		}
 
 		if (buf != _buf) {
 			munmap(buf, bsz);
@@ -164,6 +156,17 @@ wr_stmt(const char *s, size_t z)
 		}
 		dix = 0U;
 		return;
+	}
+
+	/* prep next output file, there will definitely be content */
+	if (UNLIKELY(cfd < 0)) {
+		static char tmpfn[4096U];
+		const int fl = O_CREAT | O_TRUNC | O_RDWR;
+
+		snprintf(tmpfn, sizeof(tmpfn), "%s%04zu", prfx, cstmt++);
+		if (UNLIKELY((cfd = open(tmpfn, fl, 0666)) < 0)) {
+			return;
+		}
 	}
 
 	if (*s == '@') {
