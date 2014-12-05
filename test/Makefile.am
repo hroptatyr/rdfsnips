@@ -19,7 +19,7 @@ CLEANFILES = $(check_PROGRAMS)
 
 ## summon our helper
 include clitoris.am
-AM_CLIT_LOG_FLAGS = --builddir $(builddir) --verbose
+AM_CLIT_LOG_FLAGS = --builddir $(top_builddir)/src --verbose
 TESTS_ENVIRONMENT = LC_ALL=C
 
 TESTS += $(cli_tests)
