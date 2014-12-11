@@ -1,0 +1,7 @@
+Usage: ttl-wc [FILE]...
+
+Print subject, predicate and statement counts for each FILE.
+
+  -c, --statements     Only print statements count.
+  -m, --predicates     Only print predicates count.
+  -l, --subjects       Only print subjects count.

@@ -1,0 +1,5 @@
+@prefix ex: <http://example.com/> .
+
+ex:1 a "statement" .
+ex:2 a "another statement"; ex:not-a "directive" .
+ex:3 a "compound", "statement" .
