@@ -31,6 +31,13 @@ ttl_split_LDFLAGS = $(AM_LDFLAGS)
 ttl_split_LDADD = libttl.a
 BUILT_SOURCES += ttl-split.yucc
 
+bin_PROGRAMS += ttl-wc
+ttl_wc_SOURCES = ttl-wc.c ttl-wc.yuck
+ttl_wc_CPPFLAGS = $(AM_CPPFLAGS)
+ttl_wc_LDFLAGS = $(AM_LDFLAGS)
+ttl_wc_LDADD = libttl.a
+BUILT_SOURCES += ttl-wc.yucc
+
 
 ## version rules
 version.c: version.c.in $(top_builddir)/.version
