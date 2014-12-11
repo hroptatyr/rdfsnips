@@ -284,21 +284,46 @@ fuck:
 static void
 pr_counts(yuck_t argi[static 1U], const char *fn)
 {
+	static const char tot[] = "total";
+	static size_t tnsub;
+	static size_t tnpre;
+	static size_t tnobj;
+	size_t x;
+
+	if (fn == NULL && argi->nargs) {
+		/* print a total value */
+		fn = tot;
+		nsub = tnsub;
+		npre = tnpre;
+		nobj = tnobj;
+	}
+
 	/* print counts */
 	if (argi->subjects_flag) {
-		printf("%zu ", nsub);
+		x = nsub;
 	} else if (argi->predicates_flag) {
-		printf("%zu ", npre);
+		x = npre;
 	} else if (argi->statements_flag) {
-		printf("%zu ", nobj);
+		x = nobj;
 	} else {
-		printf("% 5zu % 5zu % 5zu ", nsub, npre, nobj);
+		printf("% 5zu % 5zu % 5zu\t", nsub, npre, nobj);
+		goto pr_fn;
 	}
+	printf("%zu\t", x);
+pr_fn:
 	if (fn == NULL) {
 		puts("");
 	} else {
 		puts(fn);
 	}
+	/* sum them up for a summary */
+	tnsub += nsub;
+	tnpre += npre;
+	tnobj += nobj;
+	/* and reset */
+	nsub = 0U;
+	npre = 0U;
+	nobj = 0U;
 	return;
 }
 
@@ -320,6 +345,10 @@ main(int argc, char *argv[])
 	one:
 		rc -= count1(argi->args[i], !!argi->subjects_flag);
 		pr_counts(argi, argi->args[i]);
+	}
+	if (argi->nargs > 1U) {
+		/* print summary as well */
+		pr_counts(argi, NULL);
 	}
 
 out:
