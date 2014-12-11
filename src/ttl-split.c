@@ -245,6 +245,7 @@ proc(const char *buf, size_t bsz)
 	if (UNLIKELY(bsz == 0U)) {
 		/* and finalise */
 		fini_stmt();
+		st = FREE;
 		return 0;
 	}
 
