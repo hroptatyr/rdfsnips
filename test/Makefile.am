@@ -26,8 +26,11 @@ TESTS += $(cli_tests)
 cli_tests =
 
 EXTRA_DIST += gnd-extr.ttl
-
 cli_tests += split-01.clit
 cli_tests += split-02.clit
+
+EXTRA_DIST += simple.ttl
+cli_tests += wc-01.clit
+cli_tests += wc-02.clit
 
 ## Makefile.am ends here
