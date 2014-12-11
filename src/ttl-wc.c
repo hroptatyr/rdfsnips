@@ -95,21 +95,19 @@ escapedp(const char *sp, const char *bp)
 	return bksl;
 }
 
+
+/* the actual counting */
 static void
-cn_stmt(const char *s, size_t z)
+init_proc(void)
 {
-	/* don't count directives */
-	if (*s != '@') {
-		/* count statements */
-		nsub++;
-	}
+	nsub = 0U;
+	npre = 0U;
+	nobj = 0U;
 	return;
 }
 
-
-/* the actual counting */
 static ssize_t
-proc(const char *buf, size_t bsz)
+proc(const char *buf, size_t bsz, bool only_subs_p)
 {
 	const char *sp = buf;
 	const char *const UNUSED(ep) = buf + bsz;
@@ -121,8 +119,7 @@ proc(const char *buf, size_t bsz)
 		IN_COMMENT,
 	} st = FREE;
 
-#define init_proc()
-#define fini_proc()	proc(NULL, 0U)
+#define fini_proc()	proc(NULL, 0U, false)
 	if (UNLIKELY(bsz == 0U)) {
 		/* and finalise */
 		st = FREE;
@@ -138,7 +135,11 @@ next:
 	     ({
 		     switch (st) {
 		     case FREE:
-			     eo = strpbrk(tp, ".<\"#");
+			     if (only_subs_p) {
+				     eo = strpbrk(tp, ".<\"#");
+			     } else {
+				     eo = strpbrk(tp, ".,;<\"#");
+			     }
 			     break;
 		     case IN_ANGLES:
 			     eo = strchr(tp, '>');
@@ -162,9 +163,21 @@ next:
 		/* check character at point */
 		switch (*eo++) {
 		case '.':
-			cn_stmt(sp, eo - sp);
+			if (LIKELY(*sp != '@')) {
+				/* don't count directives */
+				nsub++;
+				npre++;
+				nobj++;
+			}
 			sp = eo;
 			goto next;
+		case ';':
+			npre++;
+			nobj++;
+			break;
+		case ',':
+			nobj++;
+			break;
 		case '<':
 			/* find matching > */
 			st = IN_ANGLES;
@@ -246,7 +259,7 @@ count1(const char *fn, bool only_subs_p)
 	     (nrd = read(fd, buf + bix, bsz - bix - 1U/*\nul*/)) > 0;) {
 		/* mark the end of the buffer */
 		buf[bix += nrd] = '\0';
-		if ((npr = proc(buf, bix)) < 0) {
+		if ((npr = proc(buf, bix, only_subs_p)) < 0) {
 			goto fuck;
 		} else if (npr == 0 && bix + 1 >= bsz) {
 			/* need a bigger buffer */
@@ -265,7 +278,7 @@ count1(const char *fn, bool only_subs_p)
 	/* finalise buffer again, just in case */
 	buf[bix] = '\0';
 	/* last try, we don't care how much gets processed */
-	(void)proc(buf, bix);
+	(void)proc(buf, bix, only_subs_p);
 	/* finalise processing */
 	fini_proc();
 
@@ -320,10 +333,6 @@ pr_fn:
 	tnsub += nsub;
 	tnpre += npre;
 	tnobj += nobj;
-	/* and reset */
-	nsub = 0U;
-	npre = 0U;
-	nobj = 0U;
 	return;
 }
 
