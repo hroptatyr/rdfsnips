@@ -342,6 +342,7 @@ main(int argc, char *argv[])
 {
 	yuck_t argi[1U];
 	int rc = 0;
+	size_t i = 0U;
 
 	if (yuck_parse(argi, argc, argv) < 0) {
 		rc = 1;
@@ -351,12 +352,12 @@ main(int argc, char *argv[])
 	if (argi->nargs == 0U) {
 		goto one;
 	}
-	for (size_t i = 0U; i < argi->nargs; i++) {
+	for (; i < argi->nargs; i++) {
 	one:
 		rc -= count1(argi->args[i], !!argi->subjects_flag);
 		pr_counts(argi, argi->args[i]);
 	}
-	if (argi->nargs > 1U) {
+	if (i > 1U) {
 		/* print summary as well */
 		pr_counts(argi, NULL);
 	}
