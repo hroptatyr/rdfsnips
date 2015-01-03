@@ -38,6 +38,13 @@ ttl_wc_LDFLAGS = $(AM_LDFLAGS)
 ttl_wc_LDADD = libttl.a
 BUILT_SOURCES += ttl-wc.yucc
 
+bin_PROGRAMS += ttl-prefixify
+ttl_prefixify_SOURCES = ttl-prefixify.c ttl-prefixify.yuck
+ttl_prefixify_CPPFLAGS = $(AM_CPPFLAGS)
+ttl_prefixify_LDFLAGS = $(AM_LDFLAGS)
+ttl_prefixify_LDADD = libttl.a
+BUILT_SOURCES += ttl-prefixify.yucc
+
 
 ## version rules
 version.c: version.c.in $(top_builddir)/.version

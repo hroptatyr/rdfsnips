@@ -1,0 +1,3 @@
+Usage: ttl-prefixify [FILE]...
+
+Substitute URIs/IRIs with prefixes.
