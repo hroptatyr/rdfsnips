@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+#include <ctype.h>
 #include "nifty.h"
 
 #if !defined MAP_ANON && defined MAP_ANONYMOUS
@@ -181,6 +182,56 @@ subst(char *str, size_t len)
 	return len;
 }
 
+static bool
+have_prefix_p(const char *str, size_t len)
+{
+/* just check if it's in already */
+	struct str_s p;
+	struct str_s u;
+	const char *const ep = str + len;
+	const char *tp;
+
+	if (memcmp(str, "@prefix", 7U) &&
+	    memcmp(str, "@PREFIX", 7U)) {
+		return false;
+	} else if (!isspace(str[7U])) {
+		return false;
+	}
+	/* skip leading whitespace */
+	for (p.str = str + 8U; p.str < ep && isspace(*p.str); p.str++);
+	/* find end of prefix */
+	if (UNLIKELY((tp = memchr(p.str, ':', ep - p.str)) == NULL)) {
+		return false;
+	}
+	/* rewind over trailing whitespace */
+	for (p.len = tp - p.str; p.len && isspace(p.str[p.len - 1U]); p.len--);
+
+	/* find the url bit */
+	if (UNLIKELY((u.str = memchr(tp, '<', ep - tp)) == NULL)) {
+		return false;
+	} else if (UNLIKELY((tp = memchr(u.str, '>', ep - u.str)) == NULL)) {
+		return false;
+	}
+	/* adjust */
+	u.str++;
+	u.len = tp - u.str;
+
+	for (size_t i = 0U; i < countof(pres); i++) {
+		if (p.len != pres[i].prfx.len) {
+			;
+		} else if (u.len != pres[i].puri.len) {
+			;
+		} else if (memcmp(pres[i].prfx.str, p.str, p.len)) {
+			;
+		} else if (memcmp(pres[i].puri.str, u.str, u.len)) {
+			;
+		} else {
+			return true;
+		}
+	};
+	return false;
+}
+
 static void
 wr_stmt(const char *s, size_t z)
 {
@@ -241,7 +292,10 @@ wr_stmt(const char *s, size_t z)
 
 	if (*s == '@') {
 		/* check if we haven't got this directive already */
-		;
+		if (have_prefix_p(s, z)) {
+			/* got him, skip */
+			return;
+		}
 	}
 
 	if (UNLIKELY(bix + z + 3U/*\n*/ > bsz)) {
