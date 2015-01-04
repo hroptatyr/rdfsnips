@@ -1,3 +1,4 @@
 Usage: ttl-prefixify [FILE]...
 
 Substitute URIs/IRIs with prefixes.
+Prefixes are taken from @prefix lines.
