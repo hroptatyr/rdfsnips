@@ -219,12 +219,16 @@ have_prefix_p(const char *str, size_t len)
 	for (size_t i = 0U; i < countof(pres); i++) {
 		if (p.len != pres[i].prfx.len) {
 			;
-		} else if (u.len != pres[i].puri.len) {
-			;
 		} else if (memcmp(pres[i].prfx.str, p.str, p.len)) {
 			;
+		} else if (u.len != pres[i].puri.len) {
+			/* FUCK, the prefixes are identical but
+			 * the urls are different :/ */
+			return true;
 		} else if (memcmp(pres[i].puri.str, u.str, u.len)) {
-			;
+			/* FUCK, the prefixes are identical but
+			 * the urls are different :/ */
+			return true;
 		} else {
 			return true;
 		}
