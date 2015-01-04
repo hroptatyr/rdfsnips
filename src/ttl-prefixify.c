@@ -61,12 +61,17 @@ struct str_s {
 	size_t len;
 };
 
-#define LIT2STR(s)	{s, sizeof(s) - 1U}
-static struct {
+struct prfx_s {
 	struct str_s prfx;
 	struct str_s puri;
-} pres[] = {
+};
+
+#define LIT2STR(s)	{s, sizeof(s) - 1U}
+static struct prfx_s pres[] = {
+	{LIT2STR("foaf"), LIT2STR("http://xmlns.com/foaf/0.1/")},
+	{LIT2STR("ldp"), LIT2STR("http://www.w3.org/ns/ldp#")},
 	{LIT2STR("owl"), LIT2STR("http://www.w3.org/2002/07/owl#")},
+	{LIT2STR("rdf"), LIT2STR("http://www.w3.org/1999/02/22-rdf-syntax-ns#")},
 };
 
 
