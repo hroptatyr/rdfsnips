@@ -218,6 +218,48 @@ wr_stmt(const char *s, size_t z)
 		return;
 	}
 
+	if (UNLIKELY(dix == 0U)) {
+		/* time to push our prefixes in */
+		for (size_t i = 0U; i < countof(pres); i++) {
+			size_t adz = 8U/*@prefix*/ +
+				pres[i].prfx.len + 1U/*:*/ + 1U/* */ +
+				1U/*<*/ + pres[i].puri.len + 1U/*>*/ +
+				1U/* */ + 1U/*.*/ + 1U/*\n*/;
+
+			if (UNLIKELY(dix + adz > dsz)) {
+				/* resize */
+				RESZ(dir, dsz, next_2pow(adz))
+				else {
+					return;
+				}
+			}
+
+			memcpy(dir + dix, "@prefix ", 8U);
+			dix += 8U;
+			memcpy(dir + dix, pres[i].prfx.str, pres[i].prfx.len);
+			dix += pres[i].prfx.len;
+			dir[dix++] = ':';
+			dir[dix++] = ' ';
+			dir[dix++] = '<';
+			memcpy(dir + dix, pres[i].puri.str, pres[i].puri.len);
+			dix += pres[i].puri.len;
+			dir[dix++] = '>';
+			dir[dix++] = ' ';
+			dir[dix++] = '.';
+			dir[dix++] = '\n';
+		}
+
+		if (UNLIKELY(dix + 1U/*\n*/ > bsz)) {
+			/* resize :O */
+			RESZ(buf, bsz, next_2pow(dix + 1U))
+			else {
+				return;
+			}
+		}
+		memcpy(buf, dir, dix);
+		bix = dix;
+	}
+
 	if (*s == '@') {
 		/* cache directives */
 		/* firstly check whether to resize our directives buffer */
