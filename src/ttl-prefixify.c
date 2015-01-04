@@ -134,46 +134,41 @@ subst(char *str, size_t len)
 /* expects STR to be \nul-term'd */
 	char *sp = str;
 	char *cp = NULL;
-	char *pp;
+	char *pp = NULL;
 
 	for (char *tp; (tp = strchr(sp, '<')) != NULL; sp = tp) {
 		tp++;
 		for (size_t i = 0U; i < countof(pres); i++) {
-			char *np;
 			char *ep;
 
+			/* check if it's an URI we know of
+			 * and find its end */
 			if (memcmp(tp, pres[i].puri.str, pres[i].puri.len)) {
 				continue;
+			} else if (UNLIKELY((ep = strchr(tp, '>')) == NULL)) {
+				/* big cluster fuck */
+				return 0U;
 			}
 			/* great, memmove the whole shebang */
 			if (cp) {
-				memmove(pp, cp, tp - cp - 1U);
-				pp += tp - cp - 1U;
+				memmove(pp, cp, tp - 1U - cp);
+				pp += tp - 1U - cp;
 			} else {
 				pp = tp - 1U;
 			}
 
-			/* save continuation for next memmove */
-			np = tp + pres[i].puri.len;
-
 			/* actually substitute for the prefix */
 			memcpy(pp, pres[i].prfx.str, pres[i].prfx.len);
-			pp[pres[i].prfx.len] = ':';
-			/* store annex point for future run */
-			pp = tp + pres[i].prfx.len;
-
-			/* pornography, find the end of the uri and ... */
-			if (UNLIKELY((ep = strchr(np, '>')) == NULL)) {
-				/* big cluster fuck */
-				return 0U;
+			pp += pres[i].prfx.len;
+			*pp++ = ':';
+			/* move value now */
+			with (size_t pz = pres[i].puri.len) {
+				memmove(pp, tp + pz, ep - (tp + pz));
+				/* store annex point for future run */
+				pp += ep - (tp + pz);
 			}
-			/* move value so it coincides with the closing angle */
-			memmove(np + 1U, np, ep - np);
-
-			/* save continuation */
-			cp = np + 1U;
-			/* and set SP for the next round */
-			sp = tp + pres[i].puri.len;
+			/* and set TP (to get SP) for the next round */
+			cp = tp = ep + 1U/*>*/;
 			break;
 		}
 	}
@@ -181,7 +176,7 @@ subst(char *str, size_t len)
 	if (cp) {
 		memmove(pp, cp, str + len - cp);
 		pp += str + len - cp;
-		len += pp - cp;
+		len = pp - str;
 	}
 	return len;
 }
