@@ -67,12 +67,16 @@ struct prfx_s {
 };
 
 #define LIT2STR(s)	{s, sizeof(s) - 1U}
-static struct prfx_s pres[] = {
+static struct prfx_s dflt_pres[64U] = {
 	{LIT2STR("foaf"), LIT2STR("http://xmlns.com/foaf/0.1/")},
 	{LIT2STR("ldp"), LIT2STR("http://www.w3.org/ns/ldp#")},
 	{LIT2STR("owl"), LIT2STR("http://www.w3.org/2002/07/owl#")},
 	{LIT2STR("rdf"), LIT2STR("http://www.w3.org/1999/02/22-rdf-syntax-ns#")},
 };
+
+static struct prfx_s *pres = dflt_pres;
+static size_t npres = 4U;
+static size_t zpres = countof(dflt_pres);
 
 
 /* helpers */
@@ -103,6 +107,14 @@ resz(void *buf, size_t old, size_t new)
 #define RESZ(_b, _oz, _nz)						\
 	size_t _nuz_ = _nz;						\
 	void *_nub_ = resz(_b, _oz, _nuz_);				\
+	if (LIKELY(_nub_ != NULL)) {					\
+		_b = _nub_;						\
+		_oz = _nuz_;						\
+	}
+
+#define RESZ_S(_b, _oz, _nz)						\
+	size_t _nuz_ = _nz;						\
+	void *_nub_ = resz(_b, _oz * sizeof(*_b), _nuz_ * sizeof(*_b));	\
 	if (LIKELY(_nub_ != NULL)) {					\
 		_b = _nub_;						\
 		_oz = _nuz_;						\
@@ -144,7 +156,7 @@ subst(char *str, size_t len)
 
 	for (char *tp; (tp = strchr(sp, '<')) != NULL; sp = tp) {
 		tp++;
-		for (size_t i = 0U; i < countof(pres); i++) {
+		for (size_t i = 0U; i < npres; i++) {
 			char *ep;
 
 			/* check if it's an URI we know of
@@ -187,10 +199,11 @@ subst(char *str, size_t len)
 	return len;
 }
 
-static bool
-have_prefix_p(const char *str, size_t len)
+static int
+add_prefix(const char *str, size_t len)
 {
-/* just check if it's in already */
+/* add prefix in STR and return 0 if added, -1 on failure, and
+ * 1 if prefix already has been registered */
 	struct str_s p;
 	struct str_s u;
 	const char *const ep = str + len;
@@ -198,30 +211,30 @@ have_prefix_p(const char *str, size_t len)
 
 	if (memcmp(str, "@prefix", 7U) &&
 	    memcmp(str, "@PREFIX", 7U)) {
-		return false;
+		return -1;
 	} else if (!isspace(str[7U])) {
-		return false;
+		return -1;
 	}
 	/* skip leading whitespace */
 	for (p.str = str + 8U; p.str < ep && isspace(*p.str); p.str++);
 	/* find end of prefix */
 	if (UNLIKELY((tp = memchr(p.str, ':', ep - p.str)) == NULL)) {
-		return false;
+		return -1;
 	}
 	/* rewind over trailing whitespace */
 	for (p.len = tp - p.str; p.len && isspace(p.str[p.len - 1U]); p.len--);
 
 	/* find the url bit */
 	if (UNLIKELY((u.str = memchr(tp, '<', ep - tp)) == NULL)) {
-		return false;
+		return -1;
 	} else if (UNLIKELY((tp = memchr(u.str, '>', ep - u.str)) == NULL)) {
-		return false;
+		return -1;
 	}
 	/* adjust */
 	u.str++;
 	u.len = tp - u.str;
 
-	for (size_t i = 0U; i < countof(pres); i++) {
+	for (size_t i = 0U; i < npres; i++) {
 		if (p.len != pres[i].prfx.len) {
 			;
 		} else if (memcmp(pres[i].prfx.str, p.str, p.len)) {
@@ -229,16 +242,38 @@ have_prefix_p(const char *str, size_t len)
 		} else if (u.len != pres[i].puri.len) {
 			/* FUCK, the prefixes are identical but
 			 * the urls are different :/ */
-			return true;
+			return 1;
 		} else if (memcmp(pres[i].puri.str, u.str, u.len)) {
 			/* FUCK, the prefixes are identical but
 			 * the urls are different :/ */
-			return true;
+			return 1;
 		} else {
-			return true;
+			return 1;
 		}
 	};
-	return false;
+	/* add him to the list of pres */
+	if (npres >= zpres) {
+		/* resize */
+		RESZ_S(pres, zpres, zpres << 1U)
+		else {
+			return -1;
+		}
+	}
+	pres[npres].prfx = p;
+	pres[npres].puri = u;
+	npres++;
+	return 0;
+}
+
+static void
+fini_prefix(void)
+{
+	if (pres != dflt_pres) {
+		(void)munmap(pres, zpres * sizeof(*pres));
+	}
+	pres = dflt_pres;
+	npres = 4U;
+	return;
 }
 
 static void
@@ -264,12 +299,14 @@ wr_stmt(const char *s, size_t z)
 			bsz = sizeof(_buf);
 		}
 		bix = 0U;
+
+		fini_prefix();
 		return;
 	}
 
 	if (UNLIKELY(bix == 0U)) {
 		/* time to push our prefixes in */
-		for (size_t i = 0U; i < countof(pres); i++) {
+		for (size_t i = 0U; i < npres; i++) {
 			size_t adz = 8U/*@prefix*/ +
 				pres[i].prfx.len + 1U/*:*/ + 1U/* */ +
 				1U/*<*/ + pres[i].puri.len + 1U/*>*/ +
@@ -301,7 +338,7 @@ wr_stmt(const char *s, size_t z)
 
 	if (*s == '@') {
 		/* check if we haven't got this directive already */
-		if (have_prefix_p(s, z)) {
+		if (add_prefix(s, z) > 0) {
 			/* got him, skip */
 			return;
 		}
