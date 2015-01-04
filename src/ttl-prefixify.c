@@ -188,10 +188,6 @@ wr_stmt(const char *s, size_t z)
 	static char *buf = _buf;
 	static size_t bsz = sizeof(_buf);
 	static size_t bix = 0U;
-	static char _dir[4096U];
-	static char *dir = _dir;
-	static size_t dsz = sizeof(_dir);
-	static size_t dix = 0U;
 	static const int cfd = STDOUT_FILENO;
 
 #define fini_stmt()	wr_stmt(NULL, 0U)
@@ -208,17 +204,10 @@ wr_stmt(const char *s, size_t z)
 			bsz = sizeof(_buf);
 		}
 		bix = 0U;
-
-		if (dir != _dir) {
-			munmap(dir, dsz);
-			dir = _dir;
-			dsz = sizeof(_dir);
-		}
-		dix = 0U;
 		return;
 	}
 
-	if (UNLIKELY(dix == 0U)) {
+	if (UNLIKELY(bix == 0U)) {
 		/* time to push our prefixes in */
 		for (size_t i = 0U; i < countof(pres); i++) {
 			size_t adz = 8U/*@prefix*/ +
@@ -226,54 +215,33 @@ wr_stmt(const char *s, size_t z)
 				1U/*<*/ + pres[i].puri.len + 1U/*>*/ +
 				1U/* */ + 1U/*.*/ + 1U/*\n*/;
 
-			if (UNLIKELY(dix + adz > dsz)) {
+			if (UNLIKELY(bix + adz > bsz)) {
 				/* resize */
-				RESZ(dir, dsz, next_2pow(adz))
+				RESZ(buf, bsz, next_2pow(adz))
 				else {
 					return;
 				}
 			}
 
-			memcpy(dir + dix, "@prefix ", 8U);
-			dix += 8U;
-			memcpy(dir + dix, pres[i].prfx.str, pres[i].prfx.len);
-			dix += pres[i].prfx.len;
-			dir[dix++] = ':';
-			dir[dix++] = ' ';
-			dir[dix++] = '<';
-			memcpy(dir + dix, pres[i].puri.str, pres[i].puri.len);
-			dix += pres[i].puri.len;
-			dir[dix++] = '>';
-			dir[dix++] = ' ';
-			dir[dix++] = '.';
-			dir[dix++] = '\n';
+			memcpy(buf + bix, "@prefix ", 8U);
+			bix += 8U;
+			memcpy(buf + bix, pres[i].prfx.str, pres[i].prfx.len);
+			bix += pres[i].prfx.len;
+			buf[bix++] = ':';
+			buf[bix++] = ' ';
+			buf[bix++] = '<';
+			memcpy(buf + bix, pres[i].puri.str, pres[i].puri.len);
+			bix += pres[i].puri.len;
+			buf[bix++] = '>';
+			buf[bix++] = ' ';
+			buf[bix++] = '.';
+			buf[bix++] = '\n';
 		}
-
-		if (UNLIKELY(dix + 1U/*\n*/ > bsz)) {
-			/* resize :O */
-			RESZ(buf, bsz, next_2pow(dix + 1U))
-			else {
-				return;
-			}
-		}
-		memcpy(buf, dir, dix);
-		bix = dix;
 	}
 
 	if (*s == '@') {
-		/* cache directives */
-		/* firstly check whether to resize our directives buffer */
-		if (UNLIKELY(dix + z + 1U/*\n*/ > dsz)) {
-			/* resize */
-			RESZ(dir, dsz, next_2pow(z + 1U))
-			else {
-				return;
-			}
-		}
-		/* just append him */
-		memcpy(dir + dix, s, z);
-		dix += z;
-		dir[dix++] = '\n';
+		/* check if we haven't got this directive already */
+		;
 	}
 
 	if (UNLIKELY(bix + z + 3U/*\n*/ > bsz)) {
