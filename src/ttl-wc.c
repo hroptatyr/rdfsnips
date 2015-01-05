@@ -319,7 +319,7 @@ pr_counts(yuck_t argi[static 1U], const char *fn)
 	} else if (argi->statements_flag) {
 		x = nobj;
 	} else {
-		printf("% 5zu % 5zu % 5zu", nsub, npre, nobj);
+		printf("%5zu %5zu %5zu", nsub, npre, nobj);
 		goto pr_fn;
 	}
 	printf("%zu", x);
