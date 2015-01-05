@@ -403,6 +403,7 @@ int
 main(int argc, char *argv[])
 {
 	yuck_t argi[1U];
+	size_t i = 0U;
 	int rc = 0;
 
 	if (yuck_parse(argi, argc, argv) < 0) {
@@ -420,7 +421,7 @@ main(int argc, char *argv[])
 	if (argi->nargs == 0U) {
 		goto one;
 	}
-	for (size_t i = 0U; i < argi->nargs; i++) {
+	for (; i < argi->nargs; i++) {
 	one:
 		rc -= split1(argi->args[i]);
 	}
