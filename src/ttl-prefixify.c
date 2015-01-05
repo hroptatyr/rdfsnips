@@ -39,6 +39,7 @@
 #endif	/* HAVE_CONFIG_H */
 #include <unistd.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <sys/mman.h>
 #include <stdio.h>
 #include <string.h>
