@@ -134,18 +134,8 @@ escapedp(const char *sp, const char *bp)
 	return bksl;
 }
 
-static size_t
-wr_buf(int fd, const char *buf, size_t bsz)
-{
-	size_t tot = 0U;
-
-	for (ssize_t nwr;
-	     tot < bsz &&
-		     (nwr = write(fd, buf + tot, bsz - tot)) > 0;
-	     tot += nwr);
-	return tot;
-}
-
+
+/* prefix handling */
 static size_t
 subst(char *str, size_t len)
 {
@@ -208,6 +198,25 @@ add_prefix(const char *str, size_t len)
 	struct str_s u;
 	const char *const ep = str + len;
 	const char *tp;
+	static char _prb[4096U];
+	static char *prb = _prb;
+	static size_t prz = sizeof(_prb);
+	static size_t pix;
+
+#define fini_prefix()	add_prefix(NULL, 0U)
+	if (UNLIKELY(len == 0U)) {
+		if (pres != dflt_pres) {
+			(void)munmap(pres, zpres * sizeof(*pres));
+		}
+		pres = dflt_pres;
+		npres = 4U;
+		if (prb != _prb) {
+			munmap(prb, prz);
+			prb = _prb;
+			prz = sizeof(_prb);
+		}
+		return 0;
+	}
 
 	if (memcmp(str, "@prefix", 7U) &&
 	    memcmp(str, "@PREFIX", 7U)) {
@@ -252,28 +261,49 @@ add_prefix(const char *str, size_t len)
 		}
 	};
 	/* add him to the list of pres */
-	if (npres >= zpres) {
+	if (UNLIKELY(npres >= zpres)) {
 		/* resize */
 		RESZ_S(pres, zpres, zpres << 1U)
 		else {
 			return -1;
 		}
 	}
+	if (UNLIKELY(pix + p.len + u.len > prz)) {
+		/* resize */
+		size_t nuz = pix + p.len + u.len;
+		RESZ(prb, prz, next_2pow(nuz))
+		else {
+			return -1;
+		}
+	}
+
+	/* copy details over to prefix buffer */
+	memcpy(prb + pix, p.str, p.len);
+	p.str = prb + pix;
+	pix += p.len;
+	memcpy(prb + pix, u.str, u.len);
+	u.str = prb + pix;
+	pix += u.len;
+
+	/* and assign */
 	pres[npres].prfx = p;
 	pres[npres].puri = u;
 	npres++;
 	return 0;
 }
 
-static void
-fini_prefix(void)
+
+/* buffer handling */
+static size_t
+wr_buf(int fd, const char *buf, size_t bsz)
 {
-	if (pres != dflt_pres) {
-		(void)munmap(pres, zpres * sizeof(*pres));
-	}
-	pres = dflt_pres;
-	npres = 4U;
-	return;
+	size_t tot = 0U;
+
+	for (ssize_t nwr;
+	     tot < bsz &&
+		     (nwr = write(fd, buf + tot, bsz - tot)) > 0;
+	     tot += nwr);
+	return tot;
 }
 
 static void
