@@ -260,18 +260,27 @@ add_prefix(const char *str, size_t len)
 			return 1;
 		}
 	};
+	/* check for room in the prefix buffer */
+	if (UNLIKELY(pix + p.len + u.len > prz)) {
+		/* resize */
+		size_t nuz = pix + p.len + u.len;
+		char *old = prb;
+		ptrdiff_t dlt;
+
+		RESZ(prb, prz, next_2pow(nuz))
+		else {
+			return -1;
+		}
+		dlt = prb - old;
+		for (size_t i = 4U; i < npres; i++) {
+			pres[i].prfx.str += dlt;
+			pres[i].puri.str += dlt;
+		}
+	}
 	/* add him to the list of pres */
 	if (UNLIKELY(npres >= zpres)) {
 		/* resize */
 		RESZ_S(pres, zpres, zpres << 1U)
-		else {
-			return -1;
-		}
-	}
-	if (UNLIKELY(pix + p.len + u.len > prz)) {
-		/* resize */
-		size_t nuz = pix + p.len + u.len;
-		RESZ(prb, prz, next_2pow(nuz))
 		else {
 			return -1;
 		}
