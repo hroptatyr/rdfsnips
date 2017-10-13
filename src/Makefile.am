@@ -45,7 +45,7 @@ ttl_prefixify_LDFLAGS = $(AM_LDFLAGS)
 ttl_prefixify_LDADD = libttl.a
 BUILT_SOURCES += ttl-prefixify.yucc
 
-noinst_PROGRAMS += nquads-fold
+bin_PROGRAMS += nquads-fold
 nquads_fold_SOURCES = nquads-fold.c nquads-fold.yuck
 nquads_fold_CPPFLAGS = $(AM_CPPFLAGS)
 nquads_fold_LDFLAGS = $(AM_LDFLAGS)
