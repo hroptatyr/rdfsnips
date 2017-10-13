@@ -45,6 +45,14 @@ ttl_prefixify_LDFLAGS = $(AM_LDFLAGS)
 ttl_prefixify_LDADD = libttl.a
 BUILT_SOURCES += ttl-prefixify.yucc
 
+noinst_PROGRAMS += nquads-fold
+nquads_fold_SOURCES = nquads-fold.c nquads-fold.yuck
+nquads_fold_SOURCES += fnv.c fnv.h
+nquads_fold_CPPFLAGS = $(AM_CPPFLAGS)
+nquads_fold_LDFLAGS = $(AM_LDFLAGS)
+nquads_fold_LDADD = libttl.a
+BUILT_SOURCES += nquads-fold.yucc
+
 
 ## version rules
 version.c: version.c.in $(top_builddir)/.version

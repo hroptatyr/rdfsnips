@@ -1,10 +1,10 @@
 /*** nifty.h -- generally handy macroes
  *
- * Copyright (C) 2009-2014 Sebastian Freundt
+ * Copyright (C) 2009-2017 Sebastian Freundt
  *
  * Author:  Sebastian Freundt <freundt@ga-group.nl>
  *
- * This file is part of mutti.
+ * This file is part of rdfsnips.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -55,6 +55,10 @@
 #if !defined countof
 # define countof(x)	(sizeof(x) / sizeof(*x))
 #endif	/* !countof */
+
+#if !defined strlenof
+# define strlenof(lit)	(sizeof(lit) - 1U)
+#endif	/* !strlenof */
 
 #define _paste(x, y)	x ## y
 #define paste(x, y)	_paste(x, y)
