@@ -1,5 +1,0 @@
-Usage: nquads-fold < NQUADS
-
-For each line of NQUADS calculate blank node identifier.
-
-  --n4                  Output in yago's N4 format.

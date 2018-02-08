@@ -46,8 +46,6 @@
 #include <errno.h>
 #include "nifty.h"
 
-static unsigned int rptp;
-
 
 static void
 __attribute__((format(printf, 1, 2)))
@@ -175,9 +173,8 @@ MurmurHash3_x64_128(const void *key, size_t len, uint8_t out[static HASHSIZE])
 static int
 fold1(FILE *fp)
 {
-	unsigned char H[2U * HASHSIZE + 5U + 1U] = {
-		'#', '@', ' ', '_', ':',
-		[2U * HASHSIZE + 5U] = '\n'
+	unsigned char H[2U * HASHSIZE + 1U] = {
+		[2U * HASHSIZE] = '\n'
 	};
 	char *line = NULL;
 	size_t llen = 0UL;
@@ -192,18 +189,17 @@ fold1(FILE *fp)
 
 		/* print hash */
 		for (size_t i = 0U; i < countof(h); i++) {
-			H[2U * i + 5U + 0U] = c2h((h[i] >> 0U) & 0b1111U);
-			H[2U * i + 5U + 1U] = c2h((h[i] >> 4U) & 0b1111U);
+			H[2U * i + 0U] = c2h((h[i] >> 0U) & 0b1111U);
+			H[2U * i + 1U] = c2h((h[i] >> 4U) & 0b1111U);
 		}
 
-		fwrite(H + 5U - rptp, 1, sizeof(H) - 5U + rptp, stdout);
-		(void)(rptp ? fwrite(line, 1, ++nrd, stdout) : 0U);
+		fwrite(H, 1, sizeof(H), stdout);
 	}
 	return 0;
 }
 
 
-#include "nquads-fold.yucc"
+#include "hashl.yucc"
 
 int
 main(int argc, char *argv[])
@@ -215,8 +211,6 @@ main(int argc, char *argv[])
 		rc = 1;
 		goto out;
 	}
-
-	rptp = argi->n4_flag ? 5U : 0U;
 
 	if (!argi->nargs) {
 		rc = fold1(stdin) < 0;

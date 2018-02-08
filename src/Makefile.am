@@ -45,12 +45,12 @@ ttl_prefixify_LDFLAGS = $(AM_LDFLAGS)
 ttl_prefixify_LDADD = libttl.a
 BUILT_SOURCES += ttl-prefixify.yucc
 
-bin_PROGRAMS += nquads-fold
-nquads_fold_SOURCES = nquads-fold.c nquads-fold.yuck
-nquads_fold_CPPFLAGS = $(AM_CPPFLAGS)
-nquads_fold_LDFLAGS = $(AM_LDFLAGS)
-nquads_fold_LDADD = libttl.a
-BUILT_SOURCES += nquads-fold.yucc
+bin_PROGRAMS += hashl
+hashl_SOURCES = hashl.c hashl.yuck
+hashl_CPPFLAGS = $(AM_CPPFLAGS)
+hashl_LDFLAGS = $(AM_LDFLAGS)
+hashl_LDADD = libttl.a
+BUILT_SOURCES += hashl.yucc
 
 
 ## version rules
