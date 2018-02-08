@@ -52,6 +52,12 @@ hashl_LDFLAGS = $(AM_LDFLAGS)
 hashl_LDADD = libttl.a
 BUILT_SOURCES += hashl.yucc
 
+noinst_PROGRAMS += metarap
+metarap_SOURCES = metarap.c metarap.yuck
+metarap_CPPFLAGS = $(shell pkg-config --cflags raptor2)
+metarap_LDFLAGS = $(shell pkg-config --libs raptor2)
+metarap_LDADD = libttl.a
+BUILT_SOURCES += metarap.yucc
 
 ## version rules
 version.c: version.c.in $(top_builddir)/.version
