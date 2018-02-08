@@ -1,0 +1,27 @@
+Usage: metarap [FILTER] < NQUADS
+
+Fold triples or quads into reified meta data.
+
+This is an online variant of:
+
+SPARQL CONSTRUCT {
+        ?x rdfs:subject ?s .
+        ?x rdfs:predicate ?p .
+        ?x rdfs:object ?o .
+        ?x a rdf:Statement .
+} WHERE {
+        BIND(foaf:name AS ?p) .
+        ?s ?p ?o .
+        BIND(IRI(CONCAT('http://hash/',
+		hash(STR(?s), STR(?p), STR(?o)))) AS ?x) .
+};
+
+with a special hash function, murmurhash3.
+
+FILTER should be a valid turtle file whose subjects should
+be the predicates of NQUADS to filter for.  The predicates
+and objects of a statement will be appended to the reified
+statement.
+
+  -i, --input=FORMAT    Input format as in rapper(1).
+  -o, --output=FORMAT   Output format as in rapper, default: turtle.

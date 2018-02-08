@@ -1,0 +1,3 @@
+Usage: hashl < LINES
+
+For each line of LINES calculate hash.

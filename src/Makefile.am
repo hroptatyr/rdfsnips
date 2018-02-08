@@ -45,13 +45,19 @@ ttl_prefixify_LDFLAGS = $(AM_LDFLAGS)
 ttl_prefixify_LDADD = libttl.a
 BUILT_SOURCES += ttl-prefixify.yucc
 
-bin_PROGRAMS += nquads-fold
-nquads_fold_SOURCES = nquads-fold.c nquads-fold.yuck
-nquads_fold_CPPFLAGS = $(AM_CPPFLAGS)
-nquads_fold_LDFLAGS = $(AM_LDFLAGS)
-nquads_fold_LDADD = libttl.a
-BUILT_SOURCES += nquads-fold.yucc
+bin_PROGRAMS += hashl
+hashl_SOURCES = hashl.c hashl.yuck
+hashl_CPPFLAGS = $(AM_CPPFLAGS)
+hashl_LDFLAGS = $(AM_LDFLAGS)
+hashl_LDADD = libttl.a
+BUILT_SOURCES += hashl.yucc
 
+noinst_PROGRAMS += metarap
+metarap_SOURCES = metarap.c metarap.yuck
+metarap_CPPFLAGS = $(shell pkg-config --cflags raptor2)
+metarap_LDFLAGS = $(shell pkg-config --libs raptor2)
+metarap_LDADD = libttl.a
+BUILT_SOURCES += metarap.yucc
 
 ## version rules
 version.c: version.c.in $(top_builddir)/.version
