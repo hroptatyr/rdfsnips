@@ -347,12 +347,13 @@ int
 main(int argc, char *argv[])
 {
 	static yuck_t argi[1U];
-	raptor_serializer *shash;
-	raptor_serializer *sfold;
-	raptor_iostream *iostream;
-	raptor_uri *base;
+	raptor_serializer *shash = NULL;
+	raptor_serializer *sfold = NULL;
+	raptor_iostream *iostream = NULL;
+	raptor_uri *base = NULL;
 	raptor_uri *x;
 	struct buf_s buf;
+	int rc = 0;
 
 	if (yuck_parse(argi, argc, argv) < 0) {
 		goto out;
@@ -363,8 +364,15 @@ main(int argc, char *argv[])
 
 	base = raptor_new_uri(world, " ");
 
-	shash = raptor_new_serializer(world, "ntriples");
-	sfold = raptor_new_serializer(world, "turtle");
+	if (!(shash = raptor_new_serializer(world, "ntriples"))) {
+		rc = 1;
+		goto err;
+	}
+	if (!(sfold = raptor_new_serializer(
+		      world, argi->output_arg ?: "turtle"))) {
+		rc = 1;
+		goto err;
+	}
 	iostream = raptor_new_iostream_from_handler(world, &buf, &handler);
 	raptor_serializer_start_to_iostream(shash, NULL, iostream);
 	raptor_serializer_start_to_file_handle(sfold, NULL, stdout);
@@ -393,7 +401,12 @@ main(int argc, char *argv[])
 	rdfsobj = raptor_new_term_from_uri(world, x);
 	raptor_free_uri(x);
 
-	with (raptor_parser *p = raptor_new_parser(world, "trig")) {
+	with (raptor_parser *p = raptor_new_parser(
+		      world, argi->input_arg ?: "trig")) {
+		if (!p) {
+			rc =1;
+			goto err;
+		}
 		raptor_parser_set_statement_handler(
 			p, &(struct ctx_s){&buf, shash, sfold}, prnt);
 		raptor_parser_parse_file_stream(p, stdin, NULL, base);
@@ -402,6 +415,8 @@ main(int argc, char *argv[])
 
 	raptor_serializer_serialize_end(shash);
 	raptor_serializer_serialize_end(sfold);
+
+err:
 	raptor_free_serializer(shash);
 	raptor_free_serializer(sfold);
 
@@ -435,5 +450,5 @@ main(int argc, char *argv[])
 
 out:
 	yuck_free(argi);
-	return 0;
+	return rc;
 }

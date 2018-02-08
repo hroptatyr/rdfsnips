@@ -1,4 +1,4 @@
-Usage: metarap < NQUADS
+Usage: metarap [FILTER] < NQUADS
 
 Fold triples or quads into reified meta data.
 
@@ -17,3 +17,11 @@ SPARQL CONSTRUCT {
 };
 
 with a special hash function, murmurhash3.
+
+FILTER should be a valid turtle file whose subjects should
+be the predicates of NQUADS to filter for.  The predicates
+and objects of a statement will be appended to the reified
+statement.
+
+  -i, --input=FORMAT    Input format as in rapper(1).
+  -o, --output=FORMAT   Output format as in rapper, default: turtle.
