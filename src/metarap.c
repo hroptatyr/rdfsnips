@@ -213,6 +213,7 @@ nmsp(void *user_data, raptor_namespace *ns)
 
 
 static raptor_world *world;
+static raptor_uri *base;
 static raptor_term *rdfssub, *rdfspred, *rdfsobj;
 static raptor_term *type;
 static raptor_term *stmt;
@@ -316,12 +317,15 @@ yep:
 	return;
 }
 
-static void
+static int
 fltr(const char *fn, raptor_serializer *sfold)
 {
 	raptor_parser *p = raptor_new_parser(world, "trig");
-	raptor_uri *fu = raptor_new_uri_from_uri_or_file_string(
-		world, NULL, (const unsigned char*)fn);
+	FILE *fp;
+
+	if (UNLIKELY(!(fp = fopen(fn, "r")))) {
+		return -1;
+	}
 
 	if (LIKELY(!zterms)) {
 		zterms = 64U;
@@ -333,11 +337,11 @@ fltr(const char *fn, raptor_serializer *sfold)
 
 	raptor_parser_set_statement_handler(p, NULL, flts);
 	raptor_parser_set_namespace_handler(p, sfold, nmsp);
-	raptor_parser_parse_file(p, fu, NULL);
+	raptor_parser_parse_file_stream(p, fp, NULL, base);
 
-	raptor_free_uri(fu);
 	raptor_free_parser(p);
-	return;
+	fclose(fp);
+	return 0;
 }
 
 
@@ -350,7 +354,6 @@ main(int argc, char *argv[])
 	raptor_serializer *shash = NULL;
 	raptor_serializer *sfold = NULL;
 	raptor_iostream *iostream = NULL;
-	raptor_uri *base = NULL;
 	raptor_uri *x;
 	struct buf_s buf;
 	int rc = 0;
@@ -362,7 +365,7 @@ main(int argc, char *argv[])
 	world = raptor_new_world();
 	raptor_world_open(world);
 
-	base = raptor_new_uri(world, " ");
+	base = raptor_new_uri(world, "-");
 
 	if (!(shash = raptor_new_serializer(world, "ntriples"))) {
 		rc = 1;
