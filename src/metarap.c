@@ -177,8 +177,8 @@ _write_bytes(void *user_data, const void *ptr, size_t size, size_t nmemb)
 	return (int)(size * nmemb);
 }
 
-static void
-UNUSED(_prnt)(struct buf_s *b)
+static __attribute__((unused)) void
+_prnt(struct buf_s *b)
 {
 	fwrite(b->s, sizeof(*b->s), b->n, stdout);
 	b->n = 0;
