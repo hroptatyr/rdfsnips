@@ -556,6 +556,9 @@ yep:
 
 	if (nterms) {
 		for (size_t j = 0U; j < nbeefs[i]; j += 2U) {
+			if (UNLIKELY(!beefs[i][j + 1U]->type)) {
+				continue;
+			}
 			raptor_serializer_serialize_statement(
 				ctx->sfold, &(raptor_statement){
 					w, .subject = H,
@@ -628,10 +631,12 @@ yep:
 		}
 		/* bang coords and keep original object term */
 		{
+			static raptor_term nul_term;
 			const size_t j = nbeefs[i] - 1U;
 			raptor_term *t = beefs[i][j];
 			const size_t sufx = str + len - eos;
 			add_cord(r, i, j, t, sufx);
+			beefs[i][j] = &nul_term;
 		}
 		break;
 
