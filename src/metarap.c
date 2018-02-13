@@ -646,6 +646,7 @@ fltr(const char *fn, raptor_serializer *sfold)
 {
 	raptor_parser *p = raptor_new_parser(world, "trig");
 	FILE *fp;
+	int r;
 
 	if (UNLIKELY(!(fp = fopen(fn, "r")))) {
 		return -1;
@@ -662,11 +663,11 @@ fltr(const char *fn, raptor_serializer *sfold)
 
 	raptor_parser_set_statement_handler(p, NULL, flts);
 	raptor_parser_set_namespace_handler(p, sfold, nmsp);
-	raptor_parser_parse_file_stream(p, fp, NULL, base);
+	r = raptor_parser_parse_file_stream(p, fp, NULL, base);
 
 	raptor_free_parser(p);
 	fclose(fp);
-	return 0;
+	return r;
 }
 
 
@@ -709,7 +710,10 @@ main(int argc, char *argv[])
 	raptor_serializer_set_namespace(sfold, rdf, "rdf");
 
 	if (argi->nargs) {
-		fltr(*argi->args, sfold);
+		if (fltr(*argi->args, sfold)) {
+			rc = 1;
+			goto err;
+		}
 	}
 
 	x = raptor_new_uri_from_uri_local_name(world, rdf, "type");
