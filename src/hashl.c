@@ -1,6 +1,6 @@
-/*** nquads-fold.c -- calculate hashes of nquads
+/*** hashl.c -- calculate hashes of nquads
  *
- * Copyright (C) 2016-2017 Sebastian Freundt
+ * Copyright (C) 2016-2018 Sebastian Freundt
  *
  * Author:  Sebastian Freundt <freundt@ga-group.nl>
  *

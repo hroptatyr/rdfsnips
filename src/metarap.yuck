@@ -23,5 +23,9 @@ be the predicates of NQUADS to filter for.  The predicates
 and objects of a statement will be appended to the reified
 statement.
 
+Objects in the filter file of the form <@PREFIX[:SUFFIX]>
+or "@PREFIX[:SUFFIX]" will be treated as PREFIX:[SUFFIX] in
+the output but with @prefix PREFIX declared in NQUADS.
+
   -i, --input=FORMAT    Input format as in rapper(1).
   -o, --output=FORMAT   Output format as in rapper, default: turtle.
