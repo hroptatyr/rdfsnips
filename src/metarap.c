@@ -409,10 +409,10 @@ add_cord(const size_t r, size_t i, size_t j, raptor_term *t, size_t sufx)
 
 static raptor_world *world;
 static raptor_uri *base;
-static raptor_term *rdfssub, *rdfspred, *rdfsobj;
+static raptor_term *rdfsub, *rdfpred, *rdfobj;
 static raptor_term *type;
 static raptor_term *stmt;
-static raptor_uri *rdfs;
+static raptor_uri *rdf;
 
 static raptor_term **terms;
 static size_t nterms;
@@ -546,13 +546,13 @@ yep:
 		ctx->sfold, &(raptor_statement){w, .subject = H, type, stmt});
 	raptor_serializer_serialize_statement(
 		ctx->sfold, &(raptor_statement){
-			w, .subject = H, rdfssub, triple->subject});
+			w, .subject = H, rdfsub, triple->subject});
 	raptor_serializer_serialize_statement(
 		ctx->sfold, &(raptor_statement){
-			w, .subject = H, rdfspred, triple->predicate});
+			w, .subject = H, rdfpred, triple->predicate});
 	raptor_serializer_serialize_statement(
 		ctx->sfold, &(raptor_statement){
-			w, .subject = H, rdfsobj, triple->object});
+			w, .subject = H, rdfobj, triple->object});
 
 	if (nterms) {
 		for (size_t j = 0U; j < nbeefs[i]; j += 2U) {
@@ -705,28 +705,31 @@ main(int argc, char *argv[])
 	raptor_serializer_start_to_iostream(shash, NULL, iostream);
 	raptor_serializer_start_to_file_handle(sfold, NULL, stdout);
 
-	rdfs = raptor_new_uri(world, "http://www.w3.org/2000/01/rdf-schema#");
-	raptor_serializer_set_namespace(sfold, rdfs, "rdfs");
+	rdf = raptor_new_uri(world, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+	raptor_serializer_set_namespace(sfold, rdf, "rdf");
 
 	if (argi->nargs) {
 		fltr(*argi->args, sfold);
 	}
 
-	type = raptor_new_term_from_uri_string(
-		world, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-	stmt = raptor_new_term_from_uri_string(
-		world, "http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement");
-
-	x = raptor_new_uri_from_uri_local_name(world, rdfs, "subject");
-	rdfssub = raptor_new_term_from_uri(world, x);
+	x = raptor_new_uri_from_uri_local_name(world, rdf, "type");
+	type = raptor_new_term_from_uri(world, x);
 	raptor_free_uri(x);
 
-	x = raptor_new_uri_from_uri_local_name(world, rdfs, "predicate");
-	rdfspred = raptor_new_term_from_uri(world, x);
+	x = raptor_new_uri_from_uri_local_name(world, rdf, "Statement");
+	stmt = raptor_new_term_from_uri(world, x);
 	raptor_free_uri(x);
 
-	x = raptor_new_uri_from_uri_local_name(world, rdfs, "object");
-	rdfsobj = raptor_new_term_from_uri(world, x);
+	x = raptor_new_uri_from_uri_local_name(world, rdf, "subject");
+	rdfsub = raptor_new_term_from_uri(world, x);
+	raptor_free_uri(x);
+
+	x = raptor_new_uri_from_uri_local_name(world, rdf, "predicate");
+	rdfpred = raptor_new_term_from_uri(world, x);
+	raptor_free_uri(x);
+
+	x = raptor_new_uri_from_uri_local_name(world, rdf, "object");
+	rdfobj = raptor_new_term_from_uri(world, x);
 	raptor_free_uri(x);
 
 	with (raptor_parser *p = raptor_new_parser(
@@ -749,14 +752,14 @@ err:
 	raptor_free_serializer(shash);
 	raptor_free_serializer(sfold);
 
-	raptor_free_term(rdfssub);
-	raptor_free_term(rdfspred);
-	raptor_free_term(rdfsobj);
+	raptor_free_term(rdfsub);
+	raptor_free_term(rdfpred);
+	raptor_free_term(rdfobj);
 	raptor_free_term(stmt);
 	raptor_free_term(type);
 
 	raptor_free_uri(base);
-	raptor_free_uri(rdfs);
+	raptor_free_uri(rdf);
 
 	raptor_free_iostream(iostream);
 
