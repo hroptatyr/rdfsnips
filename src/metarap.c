@@ -556,6 +556,9 @@ yep:
 
 	if (nterms) {
 		for (size_t j = 0U; j < nbeefs[i]; j += 2U) {
+			if (UNLIKELY(!beefs[i][j + 1U]->type)) {
+				continue;
+			}
 			raptor_serializer_serialize_statement(
 				ctx->sfold, &(raptor_statement){
 					w, .subject = H,
@@ -628,10 +631,12 @@ yep:
 		}
 		/* bang coords and keep original object term */
 		{
+			static raptor_term nul_term;
 			const size_t j = nbeefs[i] - 1U;
 			raptor_term *t = beefs[i][j];
 			const size_t sufx = str + len - eos;
 			add_cord(r, i, j, t, sufx);
+			beefs[i][j] = &nul_term;
 		}
 		break;
 
@@ -646,6 +651,7 @@ fltr(const char *fn, raptor_serializer *sfold)
 {
 	raptor_parser *p = raptor_new_parser(world, "trig");
 	FILE *fp;
+	int r;
 
 	if (UNLIKELY(!(fp = fopen(fn, "r")))) {
 		return -1;
@@ -662,11 +668,11 @@ fltr(const char *fn, raptor_serializer *sfold)
 
 	raptor_parser_set_statement_handler(p, NULL, flts);
 	raptor_parser_set_namespace_handler(p, sfold, nmsp);
-	raptor_parser_parse_file_stream(p, fp, NULL, base);
+	r = raptor_parser_parse_file_stream(p, fp, NULL, base);
 
 	raptor_free_parser(p);
 	fclose(fp);
-	return 0;
+	return r;
 }
 
 
@@ -709,7 +715,10 @@ main(int argc, char *argv[])
 	raptor_serializer_set_namespace(sfold, rdf, "rdf");
 
 	if (argi->nargs) {
-		fltr(*argi->args, sfold);
+		if (fltr(*argi->args, sfold)) {
+			rc = 1;
+			goto err;
+		}
 	}
 
 	x = raptor_new_uri_from_uri_local_name(world, rdf, "type");
