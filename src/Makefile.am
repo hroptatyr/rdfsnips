@@ -49,8 +49,14 @@ bin_PROGRAMS += hashl
 hashl_SOURCES = hashl.c hashl.yuck
 hashl_CPPFLAGS = $(AM_CPPFLAGS)
 hashl_LDFLAGS = $(AM_LDFLAGS)
-hashl_LDADD = libttl.a
 BUILT_SOURCES += hashl.yucc
+
+bin_PROGRAMS += hashf
+hashf_SOURCES = hashf.c hashf.yuck
+hashf_CFLAGS = -mavx2 -fast
+hashf_CPPFLAGS = $(AM_CPPFLAGS)
+hashf_LDFLAGS = $(AM_LDFLAGS)
+BUILT_SOURCES += hashf.yucc
 
 bin_PROGRAMS += metarap
 metarap_SOURCES = metarap.c metarap.yuck

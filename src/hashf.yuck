@@ -1,0 +1,5 @@
+Usage: hashf [FILE]...
+
+Hash (parts of) FILE.
+
+  -s, --stride=LENGTH   Make strides of LENGTH between reads.
