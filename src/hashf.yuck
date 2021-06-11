@@ -3,3 +3,5 @@ Usage: hashf [FILE]...
 Hash (parts of) FILE.
 
   -s, --stride=LENGTH   Make strides of LENGTH between reads.
+                        LENGTH takes suffixes k,M,G,T,% for kilo, mega, giga, tera,
+                        or percent, respectively.

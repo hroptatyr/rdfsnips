@@ -45,7 +45,6 @@
 #include <stdarg.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 #include <errno.h>
 #include "nifty.h"
 #define XXH_INLINE_ALL
@@ -53,7 +52,6 @@
 #define XXH_VECTOR XXH_AVX2
 #include "xxhash.h"
 
-static size_t pgsz;
 #define KB	*(1U<<10)
 #define MB	*(1U<<20)
 #define GB	*(1U<<30)
@@ -166,6 +164,7 @@ main(int argc, char *argv[])
 {
 	yuck_t argi[1U];
 	long unsigned int strd;
+	bool strp = false;
 	int rc = 0;
 
 	if (yuck_parse(argi, argc, argv) < 0) {
@@ -174,8 +173,31 @@ main(int argc, char *argv[])
 	}
 
 	/* read stride length */
-	strd = argi->stride_arg ? strtoul(argi->stride_arg, NULL, 0) : 0U;
-	pgsz = sysconf(_SC_PAGE_SIZE);
+	with (char *ep = NULL) {
+		strd = argi->stride_arg ? strtoul(argi->stride_arg, &ep, 0) : 0U;
+		if (!ep) {
+			break;
+		}
+		switch (*ep) {
+		case 't':
+		case 'T':
+			strd *= 1024U;
+		case 'g':
+		case 'G':
+			strd *= 1024U;
+		case 'm':
+		case 'M':
+			strd *= 1024U;
+		case 'k':
+		case 'K':
+			strd *= 1024U;
+		default:
+			break;
+		case '%':
+			strp = true;
+			break;
+		}
+	}
 
 	if (!argi->nargs) {
 		rc = hash1(STDIN_FILENO, 0U, 0U) < 0;
@@ -191,7 +213,10 @@ Error: cannot open file `%s'", argi->args[i]);
 		}
 		fputs(argi->args[i], stdout);
 		fputc('\t', stdout);
-		rc |= hash1(fd, fz(fd), strd) < 0;
+		with (size_t thisfz = fz(fd)) {
+			size_t thistrd = !strp ? strd : thisfz * 100U / strd;
+			rc |= hash1(fd, thisfz, thistrd) < 0;
+		}
 		close(fd);
 		fputc('\n', stdout);
 	}
