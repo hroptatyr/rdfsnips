@@ -194,7 +194,7 @@ main(int argc, char *argv[])
 		default:
 			break;
 		case '%':
-			strp = true;
+			strp = strd > 0;
 			break;
 		}
 	}
