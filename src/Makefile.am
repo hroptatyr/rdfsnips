@@ -51,6 +51,12 @@ hashl_CPPFLAGS = $(AM_CPPFLAGS)
 hashl_LDFLAGS = $(AM_LDFLAGS)
 BUILT_SOURCES += hashl.yucc
 
+bin_PROGRAMS += unqpc
+unqpc_SOURCES = unqpc.c unqpc.yuck
+unqpc_CPPFLAGS = $(AM_CPPFLAGS)
+unqpc_LDFLAGS = $(AM_LDFLAGS)
+BUILT_SOURCES += unqpc.yucc
+
 bin_PROGRAMS += hashf
 hashf_SOURCES = hashf.c hashf.yuck
 hashf_CFLAGS = -mavx2 -fast

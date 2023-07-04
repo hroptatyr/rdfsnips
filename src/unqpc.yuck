@@ -1,0 +1,3 @@
+Usage: unq%% < LINES
+
+For each line of LINES unquote percent encoding.
