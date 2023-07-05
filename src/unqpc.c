@@ -74,10 +74,12 @@ more:
 	for (; i < z && s[i] != '%'; i++);
 	if (++i < z &&
 	    (s[i] >= '0' && s[i] <= '9' ||
-	     s[i] >= 'A' && s[i] <= 'F') &&
+	     s[i] >= 'A' && s[i] <= 'F' ||
+	     s[i] >= 'a' && s[i] <= 'f') &&
 	    ++i < z &&
 	    (s[i] >= '0' && s[i] <= '9' ||
-	     s[i] >= 'A' && s[i] <= 'F')) {
+	     s[i] >= 'A' && s[i] <= 'F' ||
+	     s[i] >= 'a' && s[i] <= 'f')) {
 		return 1;
 	} else if (i >= z) {
 		return 0;
@@ -95,9 +97,11 @@ kilpc(char *restrict s, size_t z)
 		for (; i < z && s[i] != '%'; s[k++] = s[i++]);
 		if (i + 2U < z &&
 		    (s[i + 1U] >= '0' && s[i + 1U] <= '9' && (xh = s[i + 1U]) ||
-		     s[i + 1U] >= 'A' && s[i + 1U] <= 'F' && (xh = s[i + 1U] - 7U)) &&
+		     s[i + 1U] >= 'A' && s[i + 1U] <= 'F' && (xh = s[i + 1U] - 0x7U) ||
+		     s[i + 1U] >= 'a' && s[i + 1U] <= 'f' && (xh = s[i + 1U] - 0x27U)) &&
 		    (s[i + 2U] >= '0' && s[i + 2U] <= '9' && (xl = s[i + 2U]) ||
-		     s[i + 2U] >= 'A' && s[i + 2U] <= 'F' && (xl = s[i + 2U] - 7U))) {
+		     s[i + 2U] >= 'A' && s[i + 2U] <= 'F' && (xl = s[i + 2U] - 0x7U) ||
+		     s[i + 2U] >= 'a' && s[i + 2U] <= 'f' && (xl = s[i + 2U] - 0x27U))) {
 			i += 3U;
 			s[k++] = (char)((xh - 0x30U) << 4U ^ (xl - 0x30U));
 		} else if (i < z) {
