@@ -81,7 +81,11 @@ more:
 	    ++i < z &&
 	    (s[i] >= '0' && s[i] <= '9' ||
 	     s[i] >= 'A' && s[i] <= 'F' ||
-	     s[i] >= 'a' && s[i] <= 'f')) {
+	     s[i] >= 'a' && s[i] <= 'f') &&
+	    /* make sure to disallow %FF and %FE in --only-printable */
+	    (f1st == '0' ||
+	     !((s[i-1] == 'F' || s[i-1] == 'f') &&
+	       (s[i-0] == 'F' || s[i-0] == 'f')))) {
 		return 1;
 	} else if (i >= z) {
 		return 0;
