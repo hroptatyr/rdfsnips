@@ -1,3 +1,5 @@
-Usage: unq%% < LINES
+Usage: unqpc < LINES
 
-For each line of LINES unquote percent encoding.
+For each line of LINES unquote percent encoding, recursively.
+
+  --only-printable      Only decode sequences that pass isprint(3).
