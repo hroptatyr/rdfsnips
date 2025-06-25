@@ -84,8 +84,8 @@ more:
 	     s[i] >= 'a' && s[i] <= 'f') &&
 	    /* make sure to disallow %FF and %FE in --only-printable */
 	    (f1st == '0' ||
-	     !((s[i-1] == 'F' || s[i-1] == 'f') &&
-	       (s[i-0] == 'F' || s[i-0] == 'f')))) {
+	     !((s[i-1] == 'F' && (s[i-0] == 'E' || s[i-0] == 'F')) ||
+	       (s[i-1] == 'f' && (s[i-0] == 'e' || s[i-0] == 'f'))))) {
 		return 1;
 	} else if (i >= z) {
 		return 0;
