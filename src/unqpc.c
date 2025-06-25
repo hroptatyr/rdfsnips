@@ -66,6 +66,7 @@ error(const char *fmt, ...)
 
 
 static char f1st = '0';
+static char rcur = 0;
 
 static int
 haspc(const char *s, size_t z)
@@ -126,9 +127,9 @@ fold1(FILE *fp)
 	for (ssize_t nrd; (nrd = getline(&line, &llen, fp)) > 0;) {
 		nrd -= line[nrd - 1] == '\n';
 
-		while (haspc(line, nrd)) {
+		if (haspc(line, nrd)) do {
 			nrd = kilpc(line, nrd);
-		}
+		} while (rcur && haspc(line, nrd));
 		line[nrd++] = '\n';
 		fwrite(line, 1, nrd, stdout);
 	}
@@ -151,6 +152,7 @@ main(int argc, char *argv[])
 	if (argi->only_printable_flag) {
 		f1st = '2';
 	}
+	rcur = (uint_fast8_t)argi->recursive_flag;
 
 	if (!argi->nargs) {
 		rc = fold1(stdin) < 0;
